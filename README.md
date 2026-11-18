@@ -1,116 +1,118 @@
+> 🌐 **English (this file)** · ไทย: [README.th.md](README.th.md)
+
 # LINE OA Message Showcase 🤖💬
 
-Next.js + Vercel webhook chatbot (rule-based) สำหรับ**ชม reply message ของ LINE ครบทุกชนิด**:
-Flex, Carousel, Quick Reply, Templates, Imagemap, Image/Video/Audio, Sticker, Location, Postback, datetimePicker
+A rule-based **Next.js + Vercel** webhook chatbot that demonstrates **every LINE reply message type**:
+Flex, Carousel, Quick Reply, Templates, Imagemap, Image/Video/Audio, Sticker, Location, Postback, datetimePicker.
 
-พร้อมหน้าเว็บ catalog จำลองบทแชท + raw JSON ของ payload จริงที่บอทส่ง (`/api/examples`)
+Includes a bilingual (TH/EN) catalog page that simulates the chat bubbles and shows the exact raw JSON the bot sends (`/api/examples`).
 
-## Keyword ที่บอทตอบ
+## Keywords the bot answers
 
-| พิมพ์ใน LINE |จะได้รับ |
+| Type in LINE chat | You get |
 |---|---|
-| `help` / `เมนู` / `สวัสดี` | welcome + Buttons เมนู (postback ทุกปุ่ม) |
-| `text` | Text message (บรรทัดใหม่/emoji/ลิงก์) |
-| `flex` | Flex Bubble — header/hero/body/footer + ปุ่ม 4 action types |
-| `carousel` | Flex Carousel 3 ใบ |
-| `quick` | Quick Reply chips (message/postback/datetimePicker) |
-| `combo` | Flex + Quick Reply ใน reply เดียว (2 messages) |
+| `help` / `เมนู` / `สวัสดี` | welcome + Buttons menu (every button is a postback) |
+| `text` | Text message (newlines / emoji / auto-linked URLs) |
+| `flex` | Flex Bubble — header/hero/body/footer + all 4 action button types |
+| `carousel` | Flex Carousel with 3 bubbles |
+| `quick` | Quick Reply chips (message / postback / datetimePicker) |
+| `combo` | Flex + Quick Reply in one reply (2 messages) |
 | `template` | Buttons → Confirm → Image Carousel |
-| `imagemap` | Rich image 1040×1300 กดได้ 5 โซน |
-| `media` | image + video + audio (ครบ 5 messages/-reply) |
+| `imagemap` | Rich 1040×1300 image with 5 tappable zones |
+| `media` | image + video + audio (exactly 5 messages/reply) |
 | `sticker` | official sticker (package 11537) |
-| `location` | location pin + quickReply ยืนยัน |
-| อื่น ๆ | fallback + ชิปแนะนำ / รับรู้ type ของมีเดียที่ user ส่ง |
+| `location` | location pin + quickReply confirmation |
+| anything else | fallback with suggestion chips / acknowledges media types you send |
 
-## รันในเครื่อง (local)
+> Bot replies are in Thai (it is a Thai LINE OA); the catalog UI can switch to English with `?lang=en`.
+
+## Run locally
 
 ```bash
 npm install
-cp env.example .env.local   # เติม token/secret จริง (ดูด้านล่าง)
+cp env.example .env.local   # fill in real token/secret (see below)
 npm run dev                 # http://localhost:3000
 ```
 
-Environment variables (ค่าจริงอยู่ใน LINE Developers console):
+Environment variables (real values live in the LINE Developers console):
 
-| ตัวแปร | เอาจากไหน |
+| Variable | Where to find it |
 |---|---|
 | `LINE_CHANNEL_ACCESS_TOKEN` | LINE Developers → your channel → **Messaging API** → Channel access token |
 | `LINE_CHANNEL_SECRET` | LINE Developers → your channel → **Basic settings** → Channel secret |
-| `NEXT_PUBLIC_BASE_URL` | *(ไม่จำเป็น)* ใส่เฉพาะเมื่อ URL จริง ≠ origin ที่ request ส่งมา (เช่น custom domain) |
+| `NEXT_PUBLIC_BASE_URL` | *(optional)* only if the public URL differs from the request origin (e.g. custom domain) |
 
-> ⚠️ `.env.local` อยู่ใน .gitignore แล้ว — ห้าม commit token จริง
+> ⚠️ `.env.local` is gitignored — never commit a real token.
 
-## Deploy ขึ้น Vercel
+## Deploy to Vercel
 
-1. **push repo** → GitHub
-   ```bash
-   git add -A && git commit -m "LINE OA showcase" && git push
-   ```
-2. เข้า [vercel.com/new](https://vercel.com/new) → import repo → framework ถูกรู้จักอัตโนมัติ (Next.js)
-3. ตั้ง **Environment Variables** (Production + Preview): `LINE_CHANNEL_ACCESS_TOKEN`, `LINE_CHANNEL_SECRET`
-4. Deploy → ได้ URL เช่น `https://line-oa-test.vercel.app`
-5. (ทางเลือก) deploy ด้วย CLI: `npm i -g vercel && vercel --prod`
+1. **Push the repo** to GitHub.
+2. Open [vercel.com/new](https://vercel.com/new) → import the repo → framework auto-detected (Next.js).
+3. Set **Environment Variables** (Production + Preview): `LINE_CHANNEL_ACCESS_TOKEN`, `LINE_CHANNEL_SECRET`.
+4. Deploy → you get a URL like `https://atsoko-lineoa-showcase.vercel.app`.
+5. (Optional) deploy via CLI instead: `npm i -g vercel && vercel --prod`.
 
-## ตั้งค่า LINE (webhook)
+## Configure the LINE webhook
 
-1. [LINE Developers console](https://developers.line.biz/console/) → channel ของคุณ
-2. tab **Messaging API** → section **Webhook settings**:
+1. [LINE Developers console](https://developers.line.biz/console/) → your channel.
+2. **Messaging API** tab → **Webhook settings**:
    - Webhook URL: `https://<app>.vercel.app/api/webhook`
-   - กด **Verify** (ต้องได้ "Success" — route ตอบ `LINE testing message` ไว้แล้ว)
-   - เปิด **Use webhook**
-3. tab **Messaging API** → **LINE Official Test** หรือเพิ่มเพื่อน OA ของคุณแล้วลองพิมพ์ `help`
+   - Click **Verify** (must show "Success" — the route handles the `LINE testing message` ping)
+   - Turn **Use webhook** ON.
+3. Use **LINE Official Test** or add your OA as a friend, then type `help`.
 
-> ช่องทาง Free plan ก็ใช้ webhook + reply ได้ครบ (reply ไม่กินโควตาข้อความ push)
+> The Free plan supports webhook + replies fully (replies don't consume the push quota).
 
-## ทดสอบ checklist (พิมพ์ตามใน LINE)
+## Testing checklist (type these in LINE)
 
-- [ ] `help` → text + buttons 4 ปุ่ม
-- [ ] กดปุ่มใน buttons → postback → ได้ตัวอย่างนั้น
-- [ ] `flex` → การ์ดทอง; ปุ่ม "เปิดเว็บไซต์" → URI, "ดันท่า" → postback, "กดแล้วส่ง" → message, "คัดลอก" → clipboard
-- [ ] `carousel` → ปัด 3 ใบ, กด "สนใจ" → fallback + ชิป
-- [ ] `quick` → chips; กด "เลือกวันนัด" → calendar เด้ง → เลือกแล้วได้ postback.params
-- [ ] `combo` → flex แล้ว text+chips ต่อ
+- [ ] `help` → text + buttons (4 buttons)
+- [ ] press a menu button → postback → that sample is delivered
+- [ ] `flex` → gold card; test all four buttons: URI / postback / message / clipboard
+- [ ] `carousel` → swipe 3 bubbles, tap "สนใจ" → fallback with chips
+- [ ] `quick` → chips appear; tap the date picker → postback.params comes back
+- [ ] `combo` → flex card then a text message with chips
 - [ ] `template` → buttons + confirm + image carousel
-- [ ] `imagemap` → แตะแต่ละโซนได้ action ต่างกัน
-- [ ] `media` → รูป/วิดีโอ/เสียงจริงในแชท
-- [ ] พิมพ์มั่ว ๆ → fallback พร้อมชิป, ส่งรูปลงแชท → บอกรับรูป
+- [ ] `imagemap` → tap each zone → different actions fire
+- [ ] `media` → real image / video / audio in chat
+- [ ] type gibberish → fallback with chips; send a photo → bot acknowledges it
 
-## โครงสร้างโปรเจกต์
+## Project structure
 
 ```
 app/
-  api/webhook/route.ts   # webhook: ตรวจ signature → rules → Reply API
-  api/examples/route.ts  # JSON ของทุกตัวอย่าง (payload จริง)
-  page.tsx               # catalog บนเว็บ + mock chat preview
+  api/webhook/route.ts   # webhook: verify signature → rules → Reply API
+  api/examples/route.ts  # JSON of every sample (real payload)
+  page.tsx               # web catalog + mock chat previews (?lang=th|en)
 components/
-  ChatMock.tsx           # จำลองบทแชท LINE แต่ละ type (preview บนเว็บ)
+  ChatMock.tsx           # LINE chat simulation per message type
   CopyButton.tsx
 lib/
-  line.ts                # signature verification + reply/push API (fetch ตรง ไม่ใช้ SDK)
+  line.ts                # signature verification + reply/push API (plain fetch, no SDK)
   rules.ts               # rule engine: event → messages
-  examples/              # builder แต่ละ type: flex.ts, templates.ts, quickReply.ts, media.ts, imagemap.ts ...
+  site-text.ts           # TH/EN UI strings for the catalog page
+  examples/              # builders per type: flex.ts, templates.ts, quickReply.ts, media.ts, imagemap.ts …
 scripts/
-  gen-images.mjs         # สร้าง public/images/*.png (demo/card/rich) ใหม่
-  smoke-test.mjs         # ไล่ flow webhook (ต้องรัน server ก่อน)
-  wait-and-test.mjs      # รอ server พร้อมแล้วรัน smoke
-public/images/           # asset สำหรับ image/flex/imagemap
+  gen-images.mjs         # regenerate public/images/*.png (demo/card/rich)
+  smoke-test.mjs         # webhook flow test (needs a running server)
+  wait-and-test.mjs      # wait for server, then run smoke
+public/images/           # assets used by image/flex/imagemap samples
 ```
 
-## ข้อจำกัด/หมายเหตุของ LINE ที่ออกแบบหลบไว้แล้ว
+## LINE limits handled by design
 
-- **replyToken ใช้งานได้ครั้งเดียวภายในเวลาสั้น** → ทุกอย่าง reply ทันทีใน request (push API ไม่จำเป็น)
-- **1 reply ส่งได้สูงสุด 5 messages** → `media`/`combo` ออกแบบพอดีเพดาน
-- **quickReply แนบกับ flex/template/imagemap ตรง ๆ ไม่ได้** → ส่งข้อความถัดไปแทน (ดู `combo`)
-- **มีเดียห้าม URL redirect** → รูปโฮสต์เองใน `public/`, วิดีโอ/เสียงใช้ไฟล์ตรงจาก public bucket
-- **altText จำเป็นกับ flex/template/imagemap** → ตั้งไว้ทุกตัว (แสดงบน iPhone lock screen ฯลฯ)
-- **Custom LINE sticker ต้องแพลน Pro** → ใช้ package 11537 (ฟรี/ทางการ)
-- `video`/`audio` ในตัวอย่างนี้ชี้ไปไฟล์สาธารณะ (gtv-videos-bucket / soundhelix) — ใช้โชว์เท่านั้น
+- **replyToken is single-use and short-lived** → everything replies inside the request (no push API needed).
+- **Max 5 messages per reply** → `media`/`combo` are designed exactly at the ceiling.
+- **quickReply cannot attach to flex/template/imagemap** → send a follow-up text message instead (see `combo`).
+- **Media URLs must not redirect** → images are self-hosted in `public/`; video/audio use direct public file URLs.
+- **altText is required for flex/template/imagemap** → set on every sample (lock-screen previews, etc.).
+- **Custom LINE stickers require the Pro plan** → official package 11537 is used instead.
+- Sample `video`/`audio` point at public demo files (gtv-videos-bucket / soundhelix) — showcase only.
 
 ## Scripts
 
-| คำสั่ง | ทำอะไร |
+| Command | What it does |
 |---|---|
-| `npm run dev` / `build` / `start` | Next.js ธรรมดา |
-| `npm run gen:images` | สร้างภาพ demo ใหม่ (แก้สีใน `scripts/gen-images.mjs` ได้) |
-| `npm run smoke` | ทดสอบ webhook flow อัตโนมัติ (server ต้องรันอยู่, ไม่ส่งผลจริงถ้า token dummy) |
-| `npm run check:page` | เช็คหน้าเว็บ + รายการ message จาก `/api/examples` |
+| `npm run dev` / `build` / `start` | standard Next.js |
+| `npm run gen:images` | regenerate demo PNGs (edit colors in `scripts/gen-images.mjs`) |
+| `npm run smoke` | automated webhook flow test (server must be running; dummy token = no real sends) |
+| `npm run check:page` | verifies the catalog page + `/api/examples` output |

@@ -1,9 +1,13 @@
 import type { ReactNode } from "react";
 import type { PreviewKind } from "@/lib/examples/types";
+import { UI, type Lang } from "@/lib/site-text";
+
+type ChatUi = (typeof UI)["th"]["chat"];
 
 /* ---------------------------------------------------------------
    Mock component จำลองบทแชท LINE สำหรับพรีวิวบนเว็บ
    (ของจริงต้องพิมพ์ keyword ใน LINE — ตัวนี้เป็น simulation)
+   โครง/ป้าย UI แปลงภาษาตาม lang; เนื้อหาใน bubble = payload จริง (ไทย)
 ---------------------------------------------------------------- */
 
 function Frame({ children }: { children: ReactNode }) {
@@ -28,10 +32,10 @@ function BotBubble({ children, className = "" }: { children: ReactNode; classNam
   );
 }
 
-function UserBubble({ children }: { children: ReactNode }) {
+function UserBubble({ ui, children }: { ui: ChatUi; children: ReactNode }) {
   return (
     <div className="ml-auto flex max-w-[80%] flex-col items-end">
-      <span className="mb-0.5 text-[10px] font-medium text-[var(--gold-600)]">คุณ</span>
+      <span className="mb-0.5 text-[10px] font-medium text-[var(--gold-600)]">{ui.you}</span>
       <div className="rounded-xl bg-[var(--line-green)] px-3 py-2 text-[13px] leading-relaxed text-white shadow-sm">
         {children}
       </div>
@@ -39,7 +43,7 @@ function UserBubble({ children }: { children: ReactNode }) {
   );
 }
 
-function Chips({ items }: { items: string[] }) {
+function Chips({ ui, items }: { ui: ChatUi; items: string[] }) {
   return (
     <>
       <div className="flex flex-wrap gap-1.5 pt-1">
@@ -53,7 +57,7 @@ function Chips({ items }: { items: string[] }) {
         ))}
       </div>
       <div className="rounded-full border border-slate-300 bg-white px-3 py-2 text-[11px] text-slate-400">
-        เพิ่มข้อความ…
+        {ui.input}
       </div>
     </>
   );
@@ -77,14 +81,14 @@ const TBtn = ({ kind, label }: { kind: "primary" | "outline" | "link"; label: st
       {label}
     </div>
   );
-};
+}
 
 /* ---------------- per-kind mocks ---------------- */
 
-function TextMock() {
+function TextMock({ ui }: { ui: ChatUi }) {
   return (
     <Frame>
-      <UserBubble>text</UserBubble>
+      <UserBubble ui={ui}>text</UserBubble>
       <BotBubble>
         <pre className="font-sans whitespace-pre-wrap text-[13px]">
           {"📝 Text Message พื้นฐาน\n\n• ขึ้นบรรทัดใหม่ได้ด้วย \\n\n• ใส่ emoji ได้เลย 🎉🙏✨\n• ส่งได้ยาวสุด 5,000 ตัวอักษร\n\nลิงก์จะกดได้ทันที: https://atsoko.com"}
@@ -94,7 +98,7 @@ function TextMock() {
   );
 }
 
-function HelpMock() {
+function HelpMock({ ui }: { ui: ChatUi }) {
   return (
     <Frame>
       <BotBubble>
@@ -114,22 +118,20 @@ function HelpMock() {
   );
 }
 
-function StickerMock() {
+function StickerMock({ ui }: { ui: ChatUi }) {
   return (
     <Frame>
-      <UserBubble>sticker</UserBubble>
+      <UserBubble ui={ui}>sticker</UserBubble>
       <div className="pl-1 text-6xl leading-none drop-shadow-sm">🐰</div>
-      <BotBubble>
-        Official sticker จากแพ็กฟรี (packageId 11537) — ใช้ได้ทุกแพลน
-      </BotBubble>
+      <BotBubble>Official sticker จากแพ็กฟรี (packageId 11537) — ใช้ได้ทุกแพลน</BotBubble>
     </Frame>
   );
 }
 
-function LocationMock() {
+function LocationMock({ ui }: { ui: ChatUi }) {
   return (
     <Frame>
-      <UserBubble>location</UserBubble>
+      <UserBubble ui={ui}>location</UserBubble>
       <BotBubble className="max-w-[80%] overflow-hidden">
         <div className="-mx-3 -mt-2 mb-2 overflow-hidden rounded-t-xl">
           <svg viewBox="0 0 200 110" className="h-24 w-full bg-[#e8eae4]">
@@ -146,21 +148,22 @@ function LocationMock() {
           📍 ดูแผนที่ขนาดใหญ่
         </div>
       </BotBubble>
-      <Chips items={["ถูกที่นี้ ✅", "ไม่ถูก ❌"]} />
+      <Chips ui={ui} items={["ถูกที่นี้ ✅", "ไม่ถูก ❌"]} />
     </Frame>
   );
 }
 
-function MediaMock() {
+function MediaMock({ ui }: { ui: ChatUi }) {
   return (
     <Frame>
-      <UserBubble>media</UserBubble>
-      <BotBubble>🖼 Image message (ต้องเป็น URL ที่ LINE เข้าถึงได้)</BotBubble>
-      <BotBubble className="max-w-[80%] overflow-hidden">
-        <img src="/images/demo.png" alt="ตัวอย่าง" className="-mx-3 -my-2 w-full" />
+      <UserBubble ui={ui}>media</UserBubble>
+      <BotBubble>
+        🖼 image · 🎬 video · 🎧 audio — ครบ 3 ชนิดใน reply เดียว (เพดาน 5 messages)
+        <div className="-mx-3 mt-2">
+          <img src="/images/demo.png" alt="demo image message" className="w-full" />
+        </div>
       </BotBubble>
-      <BotBubble>🎬 Video message</BotBubble>
-      <BotBubble className="max-w-[80%] overflow-hidden">
+      <BotBubble className="max-w-[85%] overflow-hidden">
         <div className="relative -mx-3 -my-2 flex h-28 items-center justify-center bg-[#111827]">
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-sm">▶</span>
           <span className="absolute bottom-1.5 right-2 text-[10px] text-white/80">0:15</span>
@@ -181,10 +184,10 @@ function MediaMock() {
   );
 }
 
-function FlexMock() {
+function FlexMock({ ui }: { ui: ChatUi }) {
   return (
     <Frame>
-      <UserBubble>flex</UserBubble>
+      <UserBubble ui={ui}>flex</UserBubble>
       <div className="w-[240px] overflow-hidden rounded-xl bg-white text-[#020202] shadow-sm">
         <div className="bg-[var(--gold-400)] px-3 py-2.5">
           <div className="text-[13px] font-semibold text-white">ATSOKO Showcase</div>
@@ -221,7 +224,7 @@ function FlexMock() {
   );
 }
 
-function CarouselMock() {
+function CarouselMock({ ui }: { ui: ChatUi }) {
   const items = [
     { n: "แพ็กเกจ S", name: "Starter", price: "฿ 490", hot: false },
     { n: "แพ็กเกจ P", name: "Pro", price: "฿ 1,290", hot: true },
@@ -229,7 +232,7 @@ function CarouselMock() {
   ];
   return (
     <Frame>
-      <UserBubble>carousel</UserBubble>
+      <UserBubble ui={ui}>carousel</UserBubble>
       <div className="flex gap-2 overflow-x-auto pb-2 pr-6">
         {items.map((it) => (
           <div key={it.n} className="w-[150px] shrink-0 overflow-hidden rounded-xl bg-white shadow-sm">
@@ -251,25 +254,25 @@ function CarouselMock() {
           </div>
         ))}
       </div>
-      <div className="pl-1 text-[10px] text-slate-400">← ปัดเพื่อดู bubble ถัดไป</div>
+      <div className="pl-1 text-[10px] text-slate-400">{ui.swipeHint}</div>
     </Frame>
   );
 }
 
-function QuickMock() {
+function QuickMock({ ui }: { ui: ChatUi }) {
   return (
     <Frame>
-      <UserBubble>quick</UserBubble>
+      <UserBubble ui={ui}>quick</UserBubble>
       <BotBubble>⚡ Quick Reply — ชิปที่ขึ้นมาเหนือคีย์บอร์ด แตะแล้วส่งต่อให้บอททันที 👇</BotBubble>
-      <Chips items={["ขอบคุณ 🙏", "ดู Flex", "📅 เลือกวันนัด", "เปิดเมนู"]} />
+      <Chips ui={ui} items={["ขอบคุณ 🙏", "ดู Flex", "📅 เลือกวันนัด", "เปิดเมนู"]} />
     </Frame>
   );
 }
 
-function ComboMock() {
+function ComboMock({ ui }: { ui: ChatUi }) {
   return (
     <Frame>
-      <UserBubble>combo</UserBubble>
+      <UserBubble ui={ui}>combo</UserBubble>
       <div className="w-[220px] rounded-xl bg-white px-3 py-2.5 shadow-sm">
         <div className="text-[12px] font-semibold">🎯 Combo: Flex + Quick Reply</div>
         <div className="mt-1 text-[10px] leading-snug text-slate-500">
@@ -277,15 +280,15 @@ function ComboMock() {
         </div>
       </div>
       <BotBubble>👇 แล้วตรงนี้ก็มี Quick Reply ต่อทันที</BotBubble>
-      <Chips items={["เอาอีก", "พอแล้ว"]} />
+      <Chips ui={ui} items={["เอาอีก", "พอแล้ว"]} />
     </Frame>
   );
 }
 
-function TemplateMock() {
+function TemplateMock({ ui }: { ui: ChatUi }) {
   return (
     <Frame>
-      <UserBubble>template</UserBubble>
+      <UserBubble ui={ui}>template</UserBubble>
       <BotBubble className="max-w-[92%] overflow-hidden">
         <img src="/images/demo.png" alt="" className="-mx-3 -mt-2 mb-2 w-[calc(100%+24px)]" />
         <div className="text-[13px] font-semibold">Buttons Template</div>
@@ -300,7 +303,9 @@ function TemplateMock() {
       <BotBubble className="max-w-[92%]">
         <div className="mb-2 text-[12px]">Confirm Template — ถามเพื่อยืนยัน</div>
         <div className="flex gap-1.5">
-          <div className="flex-1 rounded-md bg-[#06c755] py-1.5 text-center text-[12px] font-medium text-white">✅ ใช่</div>
+          <div className="flex-1 rounded-md bg-[#06c755] py-1.5 text-center text-[12px] font-medium text-white">
+            ✅ ใช่
+          </div>
           <div className="flex-1 rounded-md border border-[#06c755] py-1.5 text-center text-[12px] font-medium text-[#06c755]">
             ❌ ไม่ใช่
           </div>
@@ -320,10 +325,10 @@ function TemplateMock() {
   );
 }
 
-function ImagemapMock() {
+function ImagemapMock({ ui }: { ui: ChatUi }) {
   return (
     <Frame>
-      <UserBubble>imagemap</UserBubble>
+      <UserBubble ui={ui}>imagemap</UserBubble>
       <div className="relative w-[280px] overflow-hidden rounded-xl shadow-sm">
         <img src="/images/rich.png" alt="imagemap demo" className="w-full" />
         <span className="absolute left-0 top-0 w-full border-2 border-dashed border-white/80" style={{ height: "20%" }} />
@@ -333,11 +338,9 @@ function ImagemapMock() {
         <span className="absolute border-2 border-dashed border-white" style={{ left: "50%", top: "90%", width: "50%", height: "10%" }} />
       </div>
       <div className="space-y-0.5 pl-1 text-[10px] leading-relaxed text-slate-500">
-        <div>▬ แถบทอง (บน) = message "flex"</div>
-        <div>▬ แถวน้ำเงิน = postback → Quick Reply</div>
-        <div>▬ ช่องเข้มขวา = URI เปิดเว็บ</div>
-        <div>◯ วงกลม = message "template"</div>
-        <div>▬ ส้มล่างขวา = postback ทดสอบ</div>
+        {ui.legend.map((line) => (
+          <div key={line}>{line}</div>
+        ))}
       </div>
     </Frame>
   );
@@ -345,29 +348,30 @@ function ImagemapMock() {
 
 /* ---------------- entry ---------------- */
 
-export default function ChatMock({ kind }: { kind: PreviewKind }) {
+export default function ChatMock({ kind, lang = "th" }: { kind: PreviewKind; lang?: Lang }) {
+  const ui = UI[lang].chat;
   switch (kind) {
     case "help":
-      return <HelpMock />;
+      return <HelpMock ui={ui} />;
     case "text":
-      return <TextMock />;
+      return <TextMock ui={ui} />;
     case "sticker":
-      return <StickerMock />;
+      return <StickerMock ui={ui} />;
     case "location":
-      return <LocationMock />;
+      return <LocationMock ui={ui} />;
     case "media":
-      return <MediaMock />;
+      return <MediaMock ui={ui} />;
     case "flex":
-      return <FlexMock />;
+      return <FlexMock ui={ui} />;
     case "carousel":
-      return <CarouselMock />;
+      return <CarouselMock ui={ui} />;
     case "quick":
-      return <QuickMock />;
+      return <QuickMock ui={ui} />;
     case "combo":
-      return <ComboMock />;
+      return <ComboMock ui={ui} />;
     case "template":
-      return <TemplateMock />;
+      return <TemplateMock ui={ui} />;
     case "imagemap":
-      return <ImagemapMock />;
+      return <ImagemapMock ui={ui} />;
   }
 }

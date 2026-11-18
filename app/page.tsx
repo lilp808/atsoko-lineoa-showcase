@@ -1,9 +1,22 @@
 import { EXAMPLES } from "@/lib/examples";
 import type { ExampleContext } from "@/lib/examples/types";
+import { UI, type Lang } from "@/lib/site-text";
 import ChatMock from "@/components/ChatMock";
 import CopyButton from "@/components/CopyButton";
 
-export default function Page() {
+/**
+ * ทั้งหน้าพึ่ง searchParams (lang) จึง render เป็น dynamic route
+ * ตามคู่มือ cache-components ของ Next 16: instant=false อนุญาต blocking route
+ * https://nextjs.org/docs/messages/blocking-prerender-dynamic
+ */
+export const instant = false;
+
+export default async function Page(props: PageProps<"/">) {
+  const query = await props.searchParams;
+  const lang: Lang = query.lang === "en" ? "en" : "th";
+  const t = UI[lang];
+  const other: Lang = lang === "th" ? "en" : "th";
+
   const ctx: ExampleContext = { baseUrl: "https://<app>.vercel.app" };
   const categories = [...new Set(EXAMPLES.map((e) => e.category))];
 
@@ -14,52 +27,58 @@ export default function Page() {
         <p className="font-en text-xs font-semibold tracking-[0.35em] text-[var(--gold-600)] uppercase">
           ATSOKO · LINE OA SHOWCASE
         </p>
-        <h1 className="mt-3 text-3xl font-bold text-[#111827] sm:text-4xl">
-          คลังตัวอย่าง Reply Message ของ LINE OA
-        </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-[#374151]">
-          บอท rule-base บน Next.js + Vercel — พิมพ์ keyword ในแชท LINE แล้วรับตัวอย่างจริงทันที
-          หน้านี้จำลอง preview ให้ดูก่อน พร้อม raw JSON ที่บอทจะส่งจริง
-        </p>
+        <h1 className="mt-3 text-3xl font-bold text-[#111827] sm:text-4xl">{t.h1}</h1>
+        <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-[#374151]">{t.sub}</p>
+        {t.langNote && (
+          <p className="mx-auto mt-3 max-w-xl rounded-lg bg-[var(--gold-50)] px-4 py-2 text-xs text-[var(--gold-700)]">
+            {t.langNote}
+          </p>
+        )}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-          <CopyButton text="help" label='เริ่มที่ LINE: พิมพ์ "help"' className="!px-4 !py-2 !text-sm" />
+          <CopyButton text="help" label={t.startBtn} className="!px-4 !py-2 !text-sm" />
           <a
             href="/api/examples"
             target="_blank"
             className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-[#374151] hover:bg-slate-50"
           >
-            GET /api/examples (JSON) →
+            {t.jsonLink} →
           </a>
           <a
             href="/api/webhook"
             target="_blank"
             className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-[#374151] hover:bg-slate-50"
           >
-            Webhook status →
+            {t.webhookLink} →
+          </a>
+          <a
+            href={other === "en" ? "?lang=en" : "/"}
+            className="rounded-full bg-[var(--gold-400)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--gold-500)]"
+          >
+            🌐 {t.langSwitch}
           </a>
         </div>
       </header>
 
       {/* Setup */}
       <section className="mt-10 rounded-2xl border border-[var(--gold-200)] bg-[var(--gold-50)] p-6">
-        <h2 className="text-lg font-semibold text-[var(--gold-700)]">ตั้งค่าให้บอททำงานได้ใน 4 ขั้นตอน</h2>
+        <h2 className="text-lg font-semibold text-[var(--gold-700)]">{t.setupTitle}</h2>
         <ol className="mt-3 grid gap-2 text-sm text-[var(--gold-900)] sm:grid-cols-2">
-          <li>
-            <b>1.</b> ตั้ง env บน Vercel:{" "}
-            <code className="rounded bg-white px-1.5 py-0.5 font-en text-xs">LINE_CHANNEL_ACCESS_TOKEN</code> และ{" "}
-            <code className="rounded bg-white px-1.5 py-0.5 font-en text-xs">LINE_CHANNEL_SECRET</code>
-          </li>
-          <li>
-            <b>2.</b> ตั้ง Webhook URL ใน LINE Developers →{" "}
-            <code className="rounded bg-white px-1.5 py-0.5 font-en text-xs">https://&lt;app&gt;.vercel.app/api/webhook</code>
-          </li>
-          <li>
-            <b>3.</b> กด Verify แล้วเปิด <b>Use webhook</b>
-          </li>
-          <li>
-            <b>4.</b> ทัก OA แล้วพิมพ์ keyword ด้านล่าง — คำแนะนำ: เริ่มจาก{" "}
-            <code className="rounded bg-white px-1.5 py-0.5 font-en text-xs">help</code>
-          </li>
+          {t.steps.map((s, i) => (
+            <li key={i}>
+              <b>{i + 1}.</b>{" "}
+              {s.split(/(LINE_CHANNEL_ACCESS_TOKEN|LINE_CHANNEL_SECRET|https:\/\/<app>\.vercel\.app\/api\/webhook|NEXT_PUBLIC_BASE_URL|"help"|Use webhook)/).map((part, j) =>
+                /^(LINE_CHANNEL_\w+|https:\/\/.+|NEXT_PUBLIC_BASE_URL)$/.test(part) ? (
+                  <code key={j} className="rounded bg-white px-1.5 py-0.5 font-en text-xs">
+                    {part}
+                  </code>
+                ) : part === "Use webhook" ? (
+                  <b key={j}>{part}</b>
+                ) : (
+                  <span key={j}>{part}</span>
+                ),
+              )}
+            </li>
+          ))}
         </ol>
       </section>
 
@@ -67,12 +86,16 @@ export default function Page() {
       {categories.map((cat) => (
         <section key={cat} className="mt-14">
           <h2 className="font-en text-xs font-semibold tracking-[0.3em] text-[var(--gold-600)] uppercase">
-            ◆ {cat}
+            ◆ {t.categories[cat] ?? cat}
           </h2>
           <div className="mt-4 space-y-8">
             {EXAMPLES.filter((e) => e.category === cat).map((ex) => {
               const messages = ex.build(ctx);
               const json = JSON.stringify(messages, null, 2);
+              const meta = lang === "en" ? t.examples[ex.id] : undefined;
+              const title = meta?.title ?? ex.title;
+              const description = meta?.description ?? ex.description;
+              const note = meta ? (meta.note ?? null) : ex.note ?? null;
               return (
                 <article
                   key={ex.id}
@@ -80,22 +103,22 @@ export default function Page() {
                   className="grid gap-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:grid-cols-[360px_1fr]"
                 >
                   <div className="flex justify-center lg:justify-start">
-                    <ChatMock kind={ex.preview} />
+                    <ChatMock kind={ex.preview} lang={lang} />
                   </div>
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-xl font-bold text-[#111827]">{ex.title}</h3>
-                      <CopyButton text={ex.keyword} label={`พิมพ์: ${ex.keyword}`} />
+                      <h3 className="text-xl font-bold text-[#111827]">{title}</h3>
+                      <CopyButton text={ex.keyword} label={t.typeLabel(ex.keyword)} />
                     </div>
-                    <p className="mt-1 text-sm leading-relaxed text-[#374151]">{ex.description}</p>
-                    {ex.note && (
+                    <p className="mt-1 text-sm leading-relaxed text-[#374151]">{description}</p>
+                    {note && (
                       <p className="mt-2 rounded-lg bg-[var(--gold-50)] px-3 py-2 text-xs text-[var(--gold-700)]">
-                        ⚠️ {ex.note}
+                        ⚠️ {note}
                       </p>
                     )}
                     {ex.aliases.length > 0 && (
                       <p className="mt-2 text-xs text-[#6B7280]">
-                        คำสั่งอื่นที่ใช้ได้:{" "}
+                        {t.alsoLabel}{" "}
                         {ex.aliases.map((a) => (
                           <code key={a} className="mr-1 rounded bg-slate-100 px-1.5 py-0.5 font-en text-[11px]">
                             {a}
@@ -105,15 +128,15 @@ export default function Page() {
                     )}
                     <details className="group mt-4">
                       <summary className="cursor-pointer list-none rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-[#374151] hover:bg-slate-50 group-open:border-[var(--gold-200)] group-open:bg-[var(--gold-50)]">
-                        Raw payload ({Array.isArray(messages) ? messages.length : 1} message){" "}
+                        {t.rawLabel(Array.isArray(messages) ? messages.length : 1)}{" "}
                         <span className="float-right text-xs text-[var(--gold-600)] opacity-0 group-open:opacity-100">
-                          ▲ ปิด
+                          {t.closeLabel}
                         </span>
                       </summary>
                       <div className="relative mt-2">
                         <CopyButton
                           text={json}
-                          label="copy JSON"
+                          label={t.copyJsonLabel}
                           className="absolute top-2 right-2 z-10 !bg-white"
                         />
                         <pre className="max-h-96 overflow-auto rounded-xl bg-[#111827] p-4 text-[11px] leading-relaxed text-[#FDF6E3]">
@@ -130,7 +153,7 @@ export default function Page() {
       ))}
 
       <footer className="mt-20 border-t border-slate-200 pt-6 text-center text-xs text-[#6B7280]">
-        สร้างด้วย Next.js + Vercel · rule-based chatbot ตัวอย่างโดย ATSOKO · ดู API docs จริงที่{" "}
+        {t.footer}{" "}
         <a className="text-[var(--gold-600)] underline" href="https://developers.line.biz/en/reference/messaging-api/">
           LINE Messaging API
         </a>
