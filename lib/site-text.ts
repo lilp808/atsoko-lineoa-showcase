@@ -58,10 +58,10 @@ export const UI: Record<Lang, UiStrings> = {
       swipeHint: "← ปัดเพื่อดู bubble ถัดไป",
       input: "เพิ่มข้อความ…",
       legend: [
-        "▬ แถบทอง (บน) = message \"flex\"",
-        "▬ แถวน้ำเงิน = postback → Quick Reply",
+        "▬ แถบทอง (บน) = ส่ง 'flex' (message)",
+        "▬ แถวน้ำเงิน = ส่ง 'quick' (message)",
         "▬ ช่องเข้มขวา = URI เปิดเว็บ",
-        "◯ วงกลม = message \"template\"",
+        "◯ วงกลม = ส่ง 'template' (message)",
         "▬ ส้มล่างขวา = postback ทดสอบ",
       ],
     },
@@ -100,7 +100,7 @@ export const UI: Record<Lang, UiStrings> = {
       help: {
         title: "Welcome + Buttons menu",
         description:
-          "Welcome text plus a Buttons template with shortcuts to every sample — all four buttons are postback actions.",
+          "Welcome text plus a Buttons template — each button is a message action that literally sends its keyword, so the sample appears instantly.",
       },
       text: {
         title: "Text Message",
@@ -124,7 +124,7 @@ export const UI: Record<Lang, UiStrings> = {
       flex: {
         title: "Flex Bubble",
         description:
-          "Fully hand-designed card: header/hero/body/footer with all four action buttons (URI, postback, message, clipboard).",
+          "Fully hand-designed card: header/hero/body/footer with URI, message and clipboard buttons (postback is demoed in the Templates sample).",
       },
       carousel: {
         title: "Flex Carousel",
@@ -147,7 +147,7 @@ export const UI: Record<Lang, UiStrings> = {
       imagemap: {
         title: "Image Map (Rich)",
         description:
-          "One 1040×1300 image split into tappable zones — gold band = message, blue band = postback, dark cell = URI, circle = message.",
+          "One 1040×1300 image split into tappable zones — gold band = message, blue band = message, dark cell = URI, circle = message.",
       },
     },
     chat: {
@@ -155,10 +155,10 @@ export const UI: Record<Lang, UiStrings> = {
       swipeHint: "← swipe to see the next bubble",
       input: "Add a message…",
       legend: [
-        "▬ Gold band (top) = message \"flex\"",
-        "▬ Blue band = postback → Quick Reply",
+        "▬ Gold band (top) = message 'flex'",
+        "▬ Blue band = message 'quick'",
         "▬ Dark cell (right) = URI link",
-        "◯ Circle = message \"template\"",
+        "◯ Circle = message 'template'",
         "▬ Orange (bottom-right) = test postback",
       ],
     },

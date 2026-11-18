@@ -19,7 +19,7 @@ export function buildQuickReply(ctx: ExampleContext): LineMessage[] {
       quickReply: {
         items: [
           chip("Thank you 🙏", { type: "message", label: "Thank you 🙏", text: "Thank you! 🙏" }),
-          chip("See Flex", { type: "postback", label: "See Flex", data: "kw:flex", text: "Show me Flex" }),
+          chip("See Flex", { type: "postback", label: "See Flex", data: "kw:flex", text: "flex" }),
           chip("Pick a date", {
             type: "datetimepicker",
             label: "📅 Pick a date",

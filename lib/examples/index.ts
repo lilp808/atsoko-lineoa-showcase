@@ -7,7 +7,7 @@ import { buildTemplates } from "./templates";
 import { buildImagemap } from "./imagemap";
 import { buildMedia, buildSticker, buildLocation } from "./media";
 
-/** help menu — Buttons template linking to every sample */
+/** help menu — Buttons template linking to every sample (each button sends the keyword) */
 export function buildHelp(ctx: ExampleContext): LineMessage[] {
   void ctx;
   return [
@@ -21,12 +21,12 @@ export function buildHelp(ctx: ExampleContext): LineMessage[] {
       template: {
         type: "buttons",
         title: "Pick a sample to view",
-        text: "Every button sends a postback action",
+        text: "Tap a button and it sends that keyword to the bot (message action) — you get the sample right away",
         actions: [
-          { type: "postback", label: "🃏 Flex Message", data: "kw:flex", text: "Show me Flex" },
-          { type: "postback", label: "⚡ Quick Reply", data: "kw:quick", text: "Show me Quick Reply" },
-          { type: "postback", label: "🧱 Templates", data: "kw:template", text: "Show me Templates" },
-          { type: "postback", label: "🗺 Imagemap", data: "kw:imagemap", text: "Show me Imagemap" },
+          { type: "message", label: "🃏 Flex Message", text: "flex" },
+          { type: "message", label: "⚡ Quick Reply", text: "quick" },
+          { type: "message", label: "🧱 Templates", text: "template" },
+          { type: "message", label: "🗺 Imagemap", text: "imagemap" },
         ],
       },
     },
@@ -40,7 +40,7 @@ export const EXAMPLES: MessageExample[] = [
     aliases: ["เมนู", "menu", "start", "ทักทาย", "สวัสดี", "hi", "hello"],
     category: "เมนู",
     title: "Welcome + Buttons เมนู",
-    description: "ข้อความต้อนรับพร้อม Buttons template รวมทางลัดไปทุกตัวอย่าง — ปุ่มทั้งหมดใช้ postback action",
+    description: "ข้อความต้อนรับพร้อม Buttons template — ทุกปุ่มเป็น message action ส่ง keyword ตรงๆ ไปรับตัวอย่างทันที",
     preview: "help",
     build: buildHelp,
   },
@@ -92,7 +92,7 @@ export const EXAMPLES: MessageExample[] = [
     aliases: ["การ์ด", "flex message"],
     category: "Flex",
     title: "Flex Bubble",
-    description: "การ์ดออกแบบเอง: header/hero/body/footer ครบ พร้อมปุ่ม 4 action types (URI, postback, message, clipboard)",
+    description: "การ์ดออกแบบเอง: header/hero/body/footer ครบ พร้อมปุ่ม URI / message / clipboard (postback มีในตัวอย่าง template)",
     preview: "flex",
     build: buildFlexBubble,
   },
@@ -142,7 +142,7 @@ export const EXAMPLES: MessageExample[] = [
     aliases: ["imagemap", "emap", "rich image", "ภาพกดได้"],
     category: "Imagemap",
     title: "Image Map (Rich)",
-    description: "ภาพใหญ่ 1040×1300 แบ่งโซนกดได้ — แถวทอง message, แถวน้ำเงิน postback, ช่อง URI, วงกลม message",
+    description: "ภาพใหญ่ 1040×1300 แบ่งโซนกดได้ — แถวทอง/น้ำเงิน/วงกลม ส่ง keyword ตรงๆ, ช่องเข้มขวา เปิดลิงก์, ส้มล่างขวา postback",
     preview: "imagemap",
     build: buildImagemap,
   },

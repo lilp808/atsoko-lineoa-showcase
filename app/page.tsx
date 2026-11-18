@@ -1,7 +1,7 @@
 import { EXAMPLES } from "@/lib/examples";
 import type { ExampleContext } from "@/lib/examples/types";
 import { UI, type Lang } from "@/lib/site-text";
-import ChatMock from "@/components/ChatMock";
+import ChatMock, { SimTapToast } from "@/components/ChatMock";
 import CopyButton from "@/components/CopyButton";
 
 /**
@@ -158,6 +158,8 @@ export default async function Page(props: PageProps<"/">) {
           LINE Messaging API
         </a>
       </footer>
+
+      <SimTapToast />
     </main>
   );
 }

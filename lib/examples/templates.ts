@@ -18,7 +18,7 @@ export function buildTemplates(ctx: ExampleContext): LineMessage[] {
         text: "Card + buttons below — tap one (max 4 actions when a thumbnail is shown)",
         actions: [
           { type: "message", label: "Send a message", text: "quick" },
-          { type: "postback", label: "Postback", data: "kw:flex", text: "Show me Flex" },
+          { type: "postback", label: "Postback", data: "kw:flex", text: "flex" },
           { type: "uri", label: "Open ATSOKO website", uri: "https://atsoko.com" },
           {
             type: "datetimepicker",
@@ -60,7 +60,7 @@ export function buildTemplates(ctx: ExampleContext): LineMessage[] {
           },
           {
             imageUrl: `${ctx.baseUrl}/images/demo-card-3.png`,
-            action: { type: "postback", label: "Item C", data: "kw:imagemap", text: "Show me Imagemap" },
+            action: { type: "postback", label: "Item C", data: "kw:imagemap", text: "imagemap" },
           },
         ],
       },

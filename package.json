@@ -8,7 +8,8 @@
     "start": "next start",
     "gen:images": "node scripts/gen-images.mjs",
     "smoke": "node scripts/wait-and-test.mjs",
-    "check:page": "node scripts/check-page.mjs"
+    "check:page": "node scripts/check-page.mjs",
+    "check:actions": "node scripts/check-actions.mjs"
   },
   "dependencies": {
     "next": "16.4.6",

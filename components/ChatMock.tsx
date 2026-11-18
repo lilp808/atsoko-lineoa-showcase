@@ -1,14 +1,146 @@
+"use client";
+
 import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 import type { PreviewKind } from "@/lib/examples/types";
 import { UI, type Lang } from "@/lib/site-text";
 
 type ChatUi = (typeof UI)["th"]["chat"];
 
 /* ---------------------------------------------------------------
-   Mock component: LINE chat simulation for the web preview.
-   The real thing happens in LINE chat — this mirrors the actual
-   English payloads the bot sends.
+   Mock component: interactive LINE chat simulation for the catalog.
+   Buttons/chips/zones are clickable: they scroll to the section of
+   the sample the real bot would send (a stand-in for LINE replying
+   to the tap). Tooltips show the actual payload action.
 ---------------------------------------------------------------- */
+
+/** scroll to a sample section (simulates "tap -> bot sends that sample") */
+function jump(id: string) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+/** tiny toast so every mock tap gives feedback, even actions without a section */
+function announce(msg: string) {
+  window.dispatchEvent(new CustomEvent("simtap", { detail: msg }));
+}
+
+export function SimTapToast() {
+  return <SimToastInner />;
+}
+
+function SimToastInner() {
+  const [msg, setMsg] = useState<string | null>(null);
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>;
+    const h = (e: Event) => {
+      setMsg((e as CustomEvent<string>).detail);
+      clearTimeout(t);
+      t = setTimeout(() => setMsg(null), 2400);
+    };
+    window.addEventListener("simtap", h);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("simtap", h);
+    };
+  }, []);
+  return (
+    <div
+      aria-live="polite"
+      className={`fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded-full bg-[#111827] px-4 py-2 text-xs text-white shadow-lg transition-opacity ${
+        msg ? "opacity-100" : "pointer-events-none opacity-0"
+      }`}
+    >
+      🤖 {msg ?? ""}
+    </div>
+  );
+}
+
+function Tap({
+  id,
+  sends,
+  className = "",
+  style,
+  children,
+}: {
+  id?: string;
+  sends: string;
+  className?: string;
+  style?: React.CSSProperties;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      title={`real action → sends "${sends}"`}
+      onClick={() => {
+        announce(id ? `would send "${sends}" — the bot replies with that sample below` : `would send "${sends}"`);
+        if (id) jump(id);
+      }}
+      style={style}
+      className={`cursor-pointer ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function LinkTap({
+  href,
+  className = "",
+  style,
+  children,
+}: {
+  href: string;
+  className?: string;
+  style?: React.CSSProperties;
+  children: ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      title={`real action → opens ${href}`}
+      style={style}
+      onClick={() => announce(`opens ${href}`)}
+      className={className}
+    >
+      {children}
+    </a>
+  );
+}
+
+function CopyTap({
+  text,
+  className = "",
+  children,
+}: {
+  text: string;
+  className?: string;
+  children: ReactNode;
+}) {
+  const [done, setDone] = useState(false);
+  return (
+    <button
+      type="button"
+      title={`real action → copies "${text}" to clipboard`}
+      onClick={async () => {
+        announce(`would copy "${text}" to the clipboard`);
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch {
+          /* clipboard unavailable */
+        }
+        setDone(true);
+        setTimeout(() => setDone(false), 1200);
+      }}
+      className={`cursor-pointer ${className}`}
+    >
+      {done ? "Copied ✓" : children}
+    </button>
+  );
+}
 
 function Frame({ children }: { children: ReactNode }) {
   return (
@@ -43,17 +175,25 @@ function UserBubble({ ui, children }: { ui: ChatUi; children: ReactNode }) {
   );
 }
 
-function Chips({ ui, items }: { ui: ChatUi; items: string[] }) {
+function Chip({ ui, label, target, sends }: { ui: ChatUi; label: string; target?: string; sends: string }) {
+  void ui;
+  return (
+    <Tap
+      id={target}
+      sends={sends}
+      className="rounded-full border border-[var(--line-green)] bg-white px-3 py-1.5 text-[11px] font-medium text-[#020202] hover:bg-[var(--gold-50)]"
+    >
+      {label}
+    </Tap>
+  );
+}
+
+function Chips({ ui, items }: { ui: ChatUi; items: { label: string; sends: string; target?: string }[] }) {
   return (
     <>
       <div className="flex flex-wrap gap-1.5 pt-1">
         {items.map((c) => (
-          <span
-            key={c}
-            className="rounded-full border border-[var(--line-green)] bg-white px-3 py-1.5 text-[11px] font-medium text-[#020202]"
-          >
-            {c}
-          </span>
+          <Chip key={c.label} ui={ui} label={c.label} sends={c.sends} target={c.target} />
         ))}
       </div>
       <div className="rounded-full border border-slate-300 bg-white px-3 py-2 text-[11px] text-slate-400">
@@ -62,26 +202,6 @@ function Chips({ ui, items }: { ui: ChatUi; items: string[] }) {
     </>
   );
 }
-
-const TBtn = ({ kind, label }: { kind: "primary" | "outline" | "link"; label: string }) => {
-  if (kind === "primary")
-    return (
-      <div className="rounded-md bg-[#06c755] py-1.5 text-center text-[12px] font-medium text-white">
-        {label}
-      </div>
-    );
-  if (kind === "link")
-    return (
-      <div className="py-1 text-center text-[12px] font-medium text-[var(--gold-600)] underline">
-        {label}
-      </div>
-    );
-  return (
-    <div className="rounded-md border border-[var(--line-green)] py-1.5 text-center text-[12px] font-medium text-[#06c755]">
-      {label}
-    </div>
-  );
-};
 
 /* ---------------- per-kind mocks ---------------- */
 
@@ -100,17 +220,29 @@ function TextMock({ ui }: { ui: ChatUi }) {
 
 function HelpMock({ ui }: { ui: ChatUi }) {
   void ui;
+  const buttons = [
+    { label: "🃏 Flex Message", sends: "flex", target: "flex" },
+    { label: "⚡ Quick Reply", sends: "quick", target: "quick" },
+    { label: "🧱 Templates", sends: "template", target: "template" },
+    { label: "🗺 Imagemap", sends: "imagemap", target: "imagemap" },
+  ];
   return (
     <Frame>
       <BotBubble>👋 Welcome to the ATSOKO LINE Showcase! Type a keyword below in LINE — or use the menu 👇</BotBubble>
       <BotBubble className="max-w-[92%]">
         <div className="mb-1 text-[13px] font-semibold">Pick a sample to view</div>
-        <div className="mb-2 text-[11px] text-slate-500">Every button sends a postback action</div>
+        <div className="mb-2 text-[11px] text-slate-500">Each button literally sends its keyword to the bot</div>
         <div className="space-y-1">
-          <TBtn kind="outline" label="🃏 Flex Message" />
-          <TBtn kind="outline" label="⚡ Quick Reply" />
-          <TBtn kind="outline" label="🧱 Templates" />
-          <TBtn kind="outline" label="🗺 Imagemap" />
+          {buttons.map((b) => (
+            <Tap
+              key={b.label}
+              id={b.target}
+              sends={b.sends}
+              className="w-full rounded-md border border-[var(--line-green)] py-1.5 text-center text-[12px] font-medium text-[#06c755] hover:bg-[var(--gold-50)]"
+            >
+              {b.label}
+            </Tap>
+          ))}
         </div>
       </BotBubble>
     </Frame>
@@ -147,7 +279,13 @@ function LocationMock({ ui }: { ui: ChatUi }) {
           📍 View larger map
         </div>
       </BotBubble>
-      <Chips ui={ui} items={["Correct ✅", "Not quite ❌"]} />
+      <Chips
+        ui={ui}
+        items={[
+          { label: "Correct ✅", sends: "yes (bot confirms)" },
+          { label: "Not quite ❌", sends: "confirm:no (postback)" },
+        ]}
+      />
     </Frame>
   );
 }
@@ -205,18 +343,32 @@ function FlexMock({ ui }: { ui: ChatUi }) {
           </div>
         </div>
         <div className="space-y-1.5 border-t border-slate-100 px-3 py-2.5">
-          <div className="rounded-md bg-[var(--gold-400)] py-1.5 text-center text-[11px] font-medium text-white">
+          <LinkTap
+            href="https://atsoko.com"
+            className="block rounded-md bg-[var(--gold-400)] py-1.5 text-center text-[11px] font-medium text-white hover:bg-[var(--gold-500)]"
+          >
             Open ATSOKO website
-          </div>
-          <div className="rounded-md border border-slate-300 py-1.5 text-center text-[11px] font-medium">
-            Fire a Postback
-          </div>
-          <div className="py-0.5 text-center text-[11px] font-medium text-[var(--gold-600)] underline">
+          </LinkTap>
+          <Tap
+            id="quick"
+            sends="quick"
+            className="w-full rounded-md border border-slate-300 py-1.5 text-center text-[11px] font-medium hover:bg-[var(--gold-50)]"
+          >
+            See Quick Reply
+          </Tap>
+          <Tap
+            id="carousel"
+            sends="carousel"
+            className="w-full py-0.5 text-center text-[11px] font-medium text-[var(--gold-600)] underline"
+          >
             This tap sends: carousel
-          </div>
-          <div className="py-0.5 text-center text-[11px] font-medium text-[var(--gold-600)] underline">
+          </Tap>
+          <CopyTap
+            text="FLEX2026"
+            className="w-full py-0.5 text-center text-[11px] font-medium text-[var(--gold-600)] underline"
+          >
             Copy code FLEX2026
-          </div>
+          </CopyTap>
         </div>
       </div>
     </Frame>
@@ -246,9 +398,12 @@ function CarouselMock({ ui }: { ui: ChatUi }) {
             <div className="space-y-0.5 px-2.5 py-2">
               <div className="text-[10px] font-semibold">{it.name}</div>
               <div className="text-[13px] font-semibold text-[var(--gold-500)]">{it.price}</div>
-              <div className="rounded-md bg-[var(--gold-400)] py-1 text-center text-[10px] font-medium text-white">
+              <Tap
+                sends={`Interested in ${it.name} (fallback reply)`}
+                className="w-full rounded-md bg-[var(--gold-400)] py-1 text-center text-[10px] font-medium text-white hover:bg-[var(--gold-500)]"
+              >
                 I'm interested
-              </div>
+              </Tap>
             </div>
           </div>
         ))}
@@ -263,7 +418,15 @@ function QuickMock({ ui }: { ui: ChatUi }) {
     <Frame>
       <UserBubble ui={ui}>quick</UserBubble>
       <BotBubble>⚡ Quick Reply — chips above the keyboard. Tap one and it goes straight to the bot 👇</BotBubble>
-      <Chips ui={ui} items={["Thank you 🙏", "See Flex", "📅 Pick a date", "Open menu"]} />
+      <Chips
+        ui={ui}
+        items={[
+          { label: "Thank you 🙏", sends: "Thank you! 🙏 (fallback reply)" },
+          { label: "See Flex", sends: "kw:flex", target: "flex" },
+          { label: "📅 Pick a date", sends: "dt:booking — native date picker opens" },
+          { label: "Open menu", sends: "help", target: "help" },
+        ]}
+      />
     </Frame>
   );
 }
@@ -277,9 +440,31 @@ function ComboMock({ ui }: { ui: ChatUi }) {
         <div className="mt-1 text-[10px] leading-snug text-slate-500">
           quickReply can't attach to a flex card directly — so we send a second text message.
         </div>
+        <div className="mt-2 flex gap-1.5">
+          <Tap
+            id="carousel"
+            sends="carousel"
+            className="flex-1 rounded-md bg-[var(--gold-400)] py-1 text-center text-[10px] font-medium text-white hover:bg-[var(--gold-500)]"
+          >
+            See carousel
+          </Tap>
+          <Tap
+            id="imagemap"
+            sends="imagemap"
+            className="flex-1 rounded-md border border-slate-300 py-1 text-center text-[10px] font-medium hover:bg-[var(--gold-50)]"
+          >
+            See imagemap
+          </Tap>
+        </div>
       </div>
       <BotBubble>👇 and here come the Quick Reply chips</BotBubble>
-      <Chips ui={ui} items={["More", "That's enough"]} />
+      <Chips
+        ui={ui}
+        items={[
+          { label: "More", sends: "help", target: "help" },
+          { label: "That's enough", sends: "combo:stop (farewell reply)" },
+        ]}
+      />
     </Frame>
   );
 }
@@ -293,48 +478,105 @@ function TemplateMock({ ui }: { ui: ChatUi }) {
         <div className="text-[13px] font-semibold">Buttons Template</div>
         <div className="mb-2 text-[11px] text-slate-500">Card + buttons below (max 4 with a thumbnail)</div>
         <div className="space-y-1">
-          <TBtn kind="primary" label="Send a message" />
-          <TBtn kind="outline" label="Postback" />
-          <TBtn kind="outline" label="Open ATSOKO website" />
-          <TBtn kind="outline" label="Pick a time 📅" />
+          <Tap
+            id="quick"
+            sends="quick"
+            className="w-full rounded-md bg-[#06c755] py-1.5 text-center text-[12px] font-medium text-white"
+          >
+            Send a message
+          </Tap>
+          <Tap
+            id="flex"
+            sends="postback kw:flex"
+            className="w-full rounded-md border border-[var(--line-green)] py-1.5 text-center text-[12px] font-medium text-[#06c755] hover:bg-[var(--gold-50)]"
+          >
+            Postback
+          </Tap>
+          <LinkTap
+            href="https://atsoko.com"
+            className="block w-full rounded-md border border-[var(--line-green)] py-1.5 text-center text-[12px] font-medium text-[#06c755] hover:bg-[var(--gold-50)]"
+          >
+            Open ATSOKO website
+          </LinkTap>
+          <Tap
+            id="quick"
+            sends="dt:template (time picker)"
+            className="w-full rounded-md border border-[var(--line-green)] py-1.5 text-center text-[12px] font-medium text-[#06c755] hover:bg-[var(--gold-50)]"
+          >
+            Pick a time 📅
+          </Tap>
         </div>
       </BotBubble>
       <BotBubble className="max-w-[92%]">
         <div className="mb-2 text-[12px]">Confirm Template — a yes/no question</div>
         <div className="flex gap-1.5">
-          <div className="flex-1 rounded-md bg-[#06c755] py-1.5 text-center text-[12px] font-medium text-white">
+          <Tap
+            id="carousel"
+            sends="confirm:yes"
+            className="flex-1 rounded-md bg-[#06c755] py-1.5 text-center text-[12px] font-medium text-white"
+          >
             ✅ Yes
-          </div>
-          <div className="flex-1 rounded-md border border-[#06c755] py-1.5 text-center text-[12px] font-medium text-[#06c755]">
+          </Tap>
+          <Tap
+            id="help"
+            sends="confirm-no"
+            className="flex-1 rounded-md border border-[#06c755] py-1.5 text-center text-[12px] font-medium text-[#06c755] hover:bg-[var(--gold-50)]"
+          >
             ❌ No
-          </div>
+          </Tap>
         </div>
       </BotBubble>
       <div className="flex gap-2 overflow-x-auto pb-1 pr-8">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="relative shrink-0">
-            <img src={`/images/demo-card${i === 1 ? "" : `-${i}`}.png`} alt="" className="h-20 w-20 rounded-md" />
-            <span className="absolute inset-x-0 bottom-0 rounded-b-md bg-white/90 py-0.5 text-center text-[9px] font-medium">
-              Item {["A", "B", "C"][i - 1]}
-            </span>
-          </div>
-        ))}
+        <Tap sends="I choose item A (message action → fallback reply)" className="relative block shrink-0">
+          <img src="/images/demo-card.png" alt="" className="h-20 w-20 rounded-md" />
+          <span className="absolute inset-x-0 bottom-0 rounded-b-md bg-white/90 py-0.5 text-center text-[9px] font-medium">
+            Item A
+          </span>
+        </Tap>
+        <LinkTap href="https://atsoko.com" className="relative block shrink-0 cursor-pointer">
+          <img src="/images/demo-card-2.png" alt="" className="h-20 w-20 rounded-md" />
+          <span className="absolute inset-x-0 bottom-0 rounded-b-md bg-white/90 py-0.5 text-center text-[9px] font-medium">
+            Item B
+          </span>
+        </LinkTap>
+        <Tap id="imagemap" sends="postback kw:imagemap" className="relative block shrink-0">
+          <img src="/images/demo-card-3.png" alt="" className="h-20 w-20 rounded-md" />
+          <span className="absolute inset-x-0 bottom-0 rounded-b-md bg-white/90 py-0.5 text-center text-[9px] font-medium">
+            Item C
+          </span>
+        </Tap>
       </div>
     </Frame>
   );
 }
 
 function ImagemapMock({ ui }: { ui: ChatUi }) {
+  const zone = "absolute border-2 border-dashed border-white/80 hover:bg-white/25";
   return (
     <Frame>
       <UserBubble ui={ui}>imagemap</UserBubble>
       <div className="relative w-[280px] overflow-hidden rounded-xl shadow-sm">
         <img src="/images/rich.png" alt="imagemap demo" className="w-full" />
-        <span className="absolute left-0 top-0 w-full border-2 border-dashed border-white/80" style={{ height: "20%" }} />
-        <span className="absolute left-0 w-full border-2 border-dashed border-white/80" style={{ top: "20%", height: "20%" }} />
-        <span className="absolute border-2 border-dashed border-white/80" style={{ left: "50%", top: "40%", width: "50%", height: "20%" }} />
-        <span className="absolute rounded-full border-2 border-dashed border-white/80" style={{ left: "1%", top: "51%", width: "48%", height: "38%" }} />
-        <span className="absolute border-2 border-dashed border-white" style={{ left: "50%", top: "90%", width: "50%", height: "10%" }} />
+        {/* zone overlays mirror the real actions in lib/examples/imagemap.ts */}
+        <Tap id="flex" sends="flex" className={`${zone} left-0 top-0 w-full`} style={{ height: "20%" }}>
+          <span className="sr-only">zone 1</span>
+        </Tap>
+        <Tap id="quick" sends="quick" className={`${zone} left-0 w-full`} style={{ top: "20%", height: "20%" }}>
+          <span className="sr-only">zone 2</span>
+        </Tap>
+        <LinkTap
+          href="https://atsoko.com"
+          className={`${zone} border-white`}
+          style={{ left: "50%", top: "40%", width: "50%", height: "20%" }}
+        >
+          <span className="sr-only">zone 3 — URI</span>
+        </LinkTap>
+        <Tap id="template" sends="template" className={`${zone} rounded-full`} style={{ left: "1%", top: "51%", width: "48%", height: "38%" }}>
+          <span className="sr-only">zone 4</span>
+        </Tap>
+        <Tap sends="postback imagemap:last (bot explains the zones)" className={`${zone} border-white`} style={{ left: "50%", top: "90%", width: "50%", height: "10%" }}>
+          <span className="sr-only">zone 5</span>
+        </Tap>
       </div>
       <div className="space-y-0.5 pl-1 text-[10px] leading-relaxed text-slate-500">
         {ui.legend.map((line) => (

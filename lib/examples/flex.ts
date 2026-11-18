@@ -71,12 +71,7 @@ export function buildFlexBubble(ctx: ExampleContext): LineMessage[] {
               type: "button",
               style: "secondary",
               height: "sm",
-              action: {
-                type: "postback",
-                label: "Fire a Postback",
-                data: "kw:quick",
-                text: "Show me Quick Reply",
-              },
+              action: { type: "message", label: "See Quick Reply", text: "quick" },
             },
             {
               type: "button",

@@ -11,7 +11,7 @@ Includes a bilingual (TH/EN) catalog page that simulates the chat bubbles and sh
 
 | Type in LINE chat | You get |
 |---|---|
-| `help` / `เมนู` / `สวัสดี` | welcome + Buttons menu (every button is a postback) |
+| `help` / `เมนู` / `สวัสดี` | welcome + Buttons menu (every button sends its keyword) |
 | `text` | Text message (newlines / emoji / auto-linked URLs) |
 | `flex` | Flex Bubble — header/hero/body/footer + all 4 action button types |
 | `carousel` | Flex Carousel with 3 bubbles |
@@ -66,8 +66,8 @@ Environment variables (real values live in the LINE Developers console):
 ## Testing checklist (type these in LINE)
 
 - [ ] `help` → text + buttons (4 buttons)
-- [ ] press a menu button → postback → that sample is delivered
-- [ ] `flex` → gold card; test all four buttons: URI / postback / message / clipboard
+- [ ] press a menu button → it sends the keyword (message action) → that sample appears
+- [ ] `flex` → gold card; test buttons: URI / message / clipboard (postback is demoed in Templates)
 - [ ] `carousel` → swipe 3 bubbles; tap "I'm interested" → fallback with chips
 - [ ] `quick` → chips appear; tap "📅 Pick a date" → calendar opens → postback.params comes back
 - [ ] `combo` → flex card then a text message with chips

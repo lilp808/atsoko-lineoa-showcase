@@ -13,7 +13,7 @@ Flex, Carousel, Quick Reply, Templates, Imagemap, Image/Video/Audio, Sticker, Lo
 
 | พิมพ์ใน LINE |จะได้รับ |
 |---|---|
-| `help` / `เมนู` / `สวัสดี` | welcome + Buttons เมนู (postback ทุกปุ่ม) |
+| `help` / `เมนู` / `สวัสดี` | welcome + Buttons เมนู (ทุกปุ่มส่ง keyword ตรงๆ) |
 | `text` | Text message (บรรทัดใหม่/emoji/ลิงก์) |
 | `flex` | Flex Bubble — header/hero/body/footer + ปุ่ม 4 action types |
 | `carousel` | Flex Carousel 3 ใบ |
@@ -69,8 +69,8 @@ Environment variables (ค่าจริงอยู่ใน LINE Developers c
 ## ทดสอบ checklist (พิมพ์ตามใน LINE)
 
 - [ ] `help` → text + buttons 4 ปุ่ม
-- [ ] กดปุ่มใน buttons → postback → ได้ตัวอย่างนั้น
-- [ ] `flex` → การ์ดทอง; ปุ่ม "Open ATSOKO website" → URI, "Fire a Postback" → postback, "This tap sends: carousel" → message, "Copy code FLEX2026" → clipboard
+- [ ] กดปุ่มใน buttons → ทุกปุ่มส่ง keyword เป็น message → ได้ตัวอย่างทันที
+- [ ] `flex` → การ์ดทอง; ปุ่ม "Open ATSOKO website" → URI, "See Quick Reply" → message, "This tap sends: carousel" → message, "Copy code FLEX2026" → clipboard
 - [ ] `carousel` → ปัด 3 ใบ, กด "I'm interested" → fallback + ชิป
 - [ ] `quick` → chips; กด "📅 Pick a date" → calendar เด้ง → เลือกแล้วได้ postback.params
 - [ ] `combo` → flex แล้ว text+chips ต่อ

@@ -21,12 +21,11 @@ export function buildImagemap(ctx: ExampleContext): LineMessage[] {
           label: "Zone 1: show Flex Message",
           area: { type: "rectangle", x: 0, y: 0, width: 1040, height: 260 },
         },
-        // blue band -> postback
+        // blue band -> message
         {
-          type: "postback",
-          data: "kw:quick",
-          displayText: "Show me Quick Reply",
-          label: "Zone 2: show Quick Reply (postback)",
+          type: "message",
+          text: "quick",
+          label: "Zone 2: show Quick Reply",
           area: { type: "rectangle", x: 0, y: 260, width: 1040, height: 260 },
         },
         // dark cell (right) -> URI
