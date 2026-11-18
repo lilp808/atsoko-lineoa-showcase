@@ -11,7 +11,7 @@ import type { ExampleContext } from "@/lib/examples/types";
 export async function POST(request: NextRequest) {
   const rawBody = await request.text();
 
-  const secret = process.env.LINE_CHANNEL_SECRET;
+  const secret = process.env.LINE_CHANNEL_SECRET?.trim();
   const signature = request.headers.get("x-line-signature");
 
   // 1) ตรวจลายเซ็น (ข้ามได้เฉพาะตอน dev ที่ยังไม่มี secret — production ต้องมี)

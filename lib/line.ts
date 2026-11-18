@@ -165,7 +165,7 @@ export async function verifyLineSignature(
 const LINE_API = "https://api.line.me/v2/bot";
 
 async function lineFetch(path: string, payload: unknown): Promise<{ ok: boolean; status: number; body: string }> {
-  const token = process.env.LINE_CHANNEL_ACCESS_TOKEN;
+  const token = process.env.LINE_CHANNEL_ACCESS_TOKEN?.trim();
   if (!token) {
     console.error("[line] LINE_CHANNEL_ACCESS_TOKEN is not set");
     return { ok: false, status: 0, body: "missing token" };
@@ -193,9 +193,7 @@ async function lineFetch(path: string, payload: unknown): Promise<{ ok: boolean;
 /** ตอบกลับด้วย replyToken (ใช้ฟรี ไม่กินโควตา push, แต่มีอายุสั้นมาก — ต้องส่งทันทีใน webhook) */
 export function replyMessages(replyToken: string, messages: LineMessage[]) {
   return lineFetch("/message/reply", { replyToken, messages });
-}
-
-/** ส่งแบบ push (กินโควตา, ใช้เมื่อไม่มี replyToken เช่นตอบช้า/ส่งหาเอง) */
+}/** ส่งแบบ push (กินโควตา, ใช้เมื่อไม่มี replyToken เช่นตอบช้า/ส่งหาเอง) */
 export function pushMessages(to: string, messages: LineMessage[]) {
   return lineFetch("/message/push", { to, messages });
 }
