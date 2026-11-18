@@ -7,26 +7,26 @@ import { buildTemplates } from "./templates";
 import { buildImagemap } from "./imagemap";
 import { buildMedia, buildSticker, buildLocation } from "./media";
 
-/** เมนู help — Buttons template รวมทางลัดไปยังทุกตัวอย่าง */
+/** help menu — Buttons template linking to every sample */
 export function buildHelp(ctx: ExampleContext): LineMessage[] {
   void ctx;
   return [
     {
       type: "text",
-      text: "👋 ยินดีต้อนรับสู่ ATSOKO LINE Showcase!\nบอทตัวนี้ตอบแบบ rule-based (จับ keyword) และจะส่ง *ตัวอย่างข้อความชนิดต่าง ๆ* ตามที่คุณพิมพ์\n\nลองพิมพ์คำเหล่านี้ในแชท หรือกดปุ่มด้านล่าง 👇",
+      text: "👋 Welcome to the ATSOKO LINE Showcase!\nThis bot runs on simple keyword rules and replies with *real message samples* you can inspect right in LINE.\n\nType any keyword below or use the menu 👇",
     },
     {
       type: "template",
-      altText: "เมนูตัวอย่างข้อความ — Flex / Quick / Template / Imagemap",
+      altText: "Message samples menu — Flex / Quick Reply / Templates / Imagemap",
       template: {
         type: "buttons",
-        title: "เลือกตัวอย่างที่จะชม",
-        text: "กดปุ่มเพื่อรับตัวอย่างนั้นทันที (ทุกปุ่มคือ postback action)",
+        title: "Pick a sample to view",
+        text: "Every button sends a postback action",
         actions: [
-          { type: "postback", label: "🃏 Flex Message", data: "kw:flex", text: "ขอดู Flex" },
-          { type: "postback", label: "⚡ Quick Reply", data: "kw:quick", text: "ขอดู Quick Reply" },
-          { type: "postback", label: "🧱 Templates", data: "kw:template", text: "ขอดู Templates" },
-          { type: "postback", label: "🗺 Imagemap", data: "kw:imagemap", text: "ขอดู Imagemap" },
+          { type: "postback", label: "🃏 Flex Message", data: "kw:flex", text: "Show me Flex" },
+          { type: "postback", label: "⚡ Quick Reply", data: "kw:quick", text: "Show me Quick Reply" },
+          { type: "postback", label: "🧱 Templates", data: "kw:template", text: "Show me Templates" },
+          { type: "postback", label: "🗺 Imagemap", data: "kw:imagemap", text: "Show me Imagemap" },
         ],
       },
     },

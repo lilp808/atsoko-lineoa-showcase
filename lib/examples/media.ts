@@ -1,12 +1,12 @@
 import type { LineMessage } from "@/lib/line";
 import type { ExampleContext } from "./types";
 
-/** พิมพ์ `media` — Media messages: image / video / audio (reply ส่งได้สูงสุด 5 ข้อความ) */
+/** Type `media` — Image / Video / Audio in one reply (LINE allows max 5 messages per reply) */
 export function buildMedia(ctx: ExampleContext): LineMessage[] {
   return [
     {
       type: "text",
-      text: "นี่คือตัวอย่าง media ครบ 3 ชนิดใน reply เดียว (5 ข้อความ = เพดานสูงสุดของ LINE)\n🖼 URL ต้องเป็น HTTPS เข้าถึงจากภายนอกได้ และห้าม redirect",
+      text: "Here are all three media types in a single reply (5 messages = LINE's per-reply ceiling)\n🖼 URLs must be HTTPS, publicly reachable, and never redirect",
     },
     {
       type: "image",
@@ -25,42 +25,42 @@ export function buildMedia(ctx: ExampleContext): LineMessage[] {
     },
     {
       type: "text",
-      text: "📌 สรุป: image (jpg/png ≤10MB) · video (mp4 ≤200MB + cover) · audio (mp3/m4a ≤30MB)\nLINE cache ไฟล์มีเดียครั้งแรกที่ส่ง — เปลี่ยนไฟล์ต้องเปลี่ยน URL",
+      text: "📌 Recap: image (jpg/png ≤10MB) · video (mp4 ≤200MB + cover jpg/png) · audio (mp3/m4a ≤30MB)\nLINE caches the file at first send — to update it, use a new URL",
     },
   ];
 }
 
-/** พิมพ์ `sticker` — Official sticker (ใช้ได้ทั้ง 2 message เดี่ยวและต่อท้ายข้อความ) */
+/** Type `sticker` — official sticker + plan notes */
 export function buildSticker(ctx: ExampleContext): LineMessage[] {
   void ctx;
   return [
     { type: "sticker", packageId: "11537", stickerId: "52002738" },
     {
       type: "text",
-      text: "☝️ Official sticker จากแพ็กฟรี (packageId 11537 — Brown & Cony) ไม่ต้องซื้อสติกเกอร์ก็ใช้เป็นตัวอย่างได้\n\nข้อจำกัด: custom sticker (LINE Creators Market) ใช้ได้เฉพาะแพลน Pro ขึ้นไป",
+      text: "☝️ That's an official sticker from a free pack (packageId 11537 — Brown & Cony) — usable on every plan\n\nNote: custom stickers (LINE Creators Market) require a paid plan.",
     },
   ];
 }
 
-/** พิมพ์ `location` — Location message + quick reply ต่อ */
+/** Type `location` — Location message + quickReply confirmation */
 export function buildLocation(ctx: ExampleContext): LineMessage[] {
   return [
     {
       type: "location",
       title: "ATSOKO HQ 📍",
-      address: "กรุงเทพมหานคร ประเทศไทย",
+      address: "Bangkok, Thailand",
       latitude: 13.7466,
       longitude: 100.541,
       quickReply: {
         items: [
-          { type: "bubble", action: { type: "message", label: "ถูกที่นี้ ✅", text: "yes" } },
-          { type: "bubble", action: { type: "postback", label: "ไม่ถูก ❌", data: "confirm:no", text: "ไม่ถูกค่ะ" } },
+          { type: "bubble", action: { type: "message", label: "Correct ✅", text: "yes" } },
+          { type: "bubble", action: { type: "postback", label: "Not quite ❌", data: "confirm:no", text: "Not quite right" } },
         ],
       },
     },
     {
       type: "text",
-      text: "Location message แสดง map ย่อในแชท กดแล้วเปิดหมุดบนแผนที่ได้ (note: quickReply แนบกับ location ได้ด้วย 👆)",
+      text: "A Location message renders a mini map right in the chat — tapping it opens the pin in the map app.\nNote: quickReply can attach to location messages too 👆",
     },
   ];
 }

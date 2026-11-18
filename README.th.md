@@ -7,6 +7,8 @@ Flex, Carousel, Quick Reply, Templates, Imagemap, Image/Video/Audio, Sticker, Lo
 
 พร้อมหน้าเว็บ catalog (สลับ TH/EN ด้วย `?lang=en`) จำลองบทแชท + raw JSON ของ payload จริงที่บอทส่ง (`/api/examples`)
 
+> 📣 ตอนนี้ข้อความที่บอทตอบจริงเป็น **ภาษาอังกฤษ** ทั้งหมด (keyword/alias ภาษาไทยยังใช้ได้เหมือนเดิม)
+
 ## Keyword ที่บอทตอบ
 
 | พิมพ์ใน LINE |จะได้รับ |
@@ -68,9 +70,9 @@ Environment variables (ค่าจริงอยู่ใน LINE Developers c
 
 - [ ] `help` → text + buttons 4 ปุ่ม
 - [ ] กดปุ่มใน buttons → postback → ได้ตัวอย่างนั้น
-- [ ] `flex` → การ์ดทอง; ปุ่ม "เปิดเว็บไซต์" → URI, "ดันท่า" → postback, "กดแล้วส่ง" → message, "คัดลอก" → clipboard
-- [ ] `carousel` → ปัด 3 ใบ, กด "สนใจ" → fallback + ชิป
-- [ ] `quick` → chips; กด "เลือกวันนัด" → calendar เด้ง → เลือกแล้วได้ postback.params
+- [ ] `flex` → การ์ดทอง; ปุ่ม "Open ATSOKO website" → URI, "Fire a Postback" → postback, "This tap sends: carousel" → message, "Copy code FLEX2026" → clipboard
+- [ ] `carousel` → ปัด 3 ใบ, กด "I'm interested" → fallback + ชิป
+- [ ] `quick` → chips; กด "📅 Pick a date" → calendar เด้ง → เลือกแล้วได้ postback.params
 - [ ] `combo` → flex แล้ว text+chips ต่อ
 - [ ] `template` → buttons + confirm + image carousel
 - [ ] `imagemap` → แตะแต่ละโซนได้ action ต่างกัน

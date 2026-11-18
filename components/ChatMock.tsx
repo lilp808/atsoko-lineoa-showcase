@@ -5,9 +5,9 @@ import { UI, type Lang } from "@/lib/site-text";
 type ChatUi = (typeof UI)["th"]["chat"];
 
 /* ---------------------------------------------------------------
-   Mock component จำลองบทแชท LINE สำหรับพรีวิวบนเว็บ
-   (ของจริงต้องพิมพ์ keyword ใน LINE — ตัวนี้เป็น simulation)
-   โครง/ป้าย UI แปลงภาษาตาม lang; เนื้อหาใน bubble = payload จริง (ไทย)
+   Mock component: LINE chat simulation for the web preview.
+   The real thing happens in LINE chat — this mirrors the actual
+   English payloads the bot sends.
 ---------------------------------------------------------------- */
 
 function Frame({ children }: { children: ReactNode }) {
@@ -81,7 +81,7 @@ const TBtn = ({ kind, label }: { kind: "primary" | "outline" | "link"; label: st
       {label}
     </div>
   );
-}
+};
 
 /* ---------------- per-kind mocks ---------------- */
 
@@ -91,7 +91,7 @@ function TextMock({ ui }: { ui: ChatUi }) {
       <UserBubble ui={ui}>text</UserBubble>
       <BotBubble>
         <pre className="font-sans whitespace-pre-wrap text-[13px]">
-          {"📝 Text Message พื้นฐาน\n\n• ขึ้นบรรทัดใหม่ได้ด้วย \\n\n• ใส่ emoji ได้เลย 🎉🙏✨\n• ส่งได้ยาวสุด 5,000 ตัวอักษร\n\nลิงก์จะกดได้ทันที: https://atsoko.com"}
+          {"📝 Basic Text Message\n\n• New lines with \\n\n• Emoji work out of the box 🎉🙏✨\n• Up to 5,000 characters\n\nLinks are tappable: https://atsoko.com"}
         </pre>
       </BotBubble>
     </Frame>
@@ -99,14 +99,13 @@ function TextMock({ ui }: { ui: ChatUi }) {
 }
 
 function HelpMock({ ui }: { ui: ChatUi }) {
+  void ui;
   return (
     <Frame>
-      <BotBubble>
-        👋 ยินดีต้อนรับสู่ ATSOKO LINE Showcase! ลองพิมพ์คำเหล่านี้ในแชท หรือกดปุ่มด้านล่าง 👇
-      </BotBubble>
+      <BotBubble>👋 Welcome to the ATSOKO LINE Showcase! Type a keyword below in LINE — or use the menu 👇</BotBubble>
       <BotBubble className="max-w-[92%]">
-        <div className="mb-1 text-[13px] font-semibold">เลือกตัวอย่างที่จะชม</div>
-        <div className="mb-2 text-[11px] text-slate-500">กดปุ่มเพื่อรับตัวอย่างทันที (ทุกปุ่มคือ postback)</div>
+        <div className="mb-1 text-[13px] font-semibold">Pick a sample to view</div>
+        <div className="mb-2 text-[11px] text-slate-500">Every button sends a postback action</div>
         <div className="space-y-1">
           <TBtn kind="outline" label="🃏 Flex Message" />
           <TBtn kind="outline" label="⚡ Quick Reply" />
@@ -123,7 +122,7 @@ function StickerMock({ ui }: { ui: ChatUi }) {
     <Frame>
       <UserBubble ui={ui}>sticker</UserBubble>
       <div className="pl-1 text-6xl leading-none drop-shadow-sm">🐰</div>
-      <BotBubble>Official sticker จากแพ็กฟรี (packageId 11537) — ใช้ได้ทุกแพลน</BotBubble>
+      <BotBubble>Official sticker from a free pack (packageId 11537) — usable on every plan</BotBubble>
     </Frame>
   );
 }
@@ -143,12 +142,12 @@ function LocationMock({ ui }: { ui: ChatUi }) {
           </svg>
         </div>
         <div className="text-[13px] font-semibold">ATSOKO HQ 📍</div>
-        <div className="text-[11px] text-slate-500">กรุงเทพมหานคร ประเทศไทย</div>
+        <div className="text-[11px] text-slate-500">Bangkok, Thailand</div>
         <div className="mt-1.5 border-t border-slate-100 pt-1 text-[11px] text-[var(--line-green)]">
-          📍 ดูแผนที่ขนาดใหญ่
+          📍 View larger map
         </div>
       </BotBubble>
-      <Chips ui={ui} items={["ถูกที่นี้ ✅", "ไม่ถูก ❌"]} />
+      <Chips ui={ui} items={["Correct ✅", "Not quite ❌"]} />
     </Frame>
   );
 }
@@ -158,7 +157,7 @@ function MediaMock({ ui }: { ui: ChatUi }) {
     <Frame>
       <UserBubble ui={ui}>media</UserBubble>
       <BotBubble>
-        🖼 image · 🎬 video · 🎧 audio — ครบ 3 ชนิดใน reply เดียว (เพดาน 5 messages)
+        🖼 image · 🎬 video · 🎧 audio — all three in one reply (5-message ceiling)
         <div className="-mx-3 mt-2">
           <img src="/images/demo.png" alt="demo image message" className="w-full" />
         </div>
@@ -191,32 +190,32 @@ function FlexMock({ ui }: { ui: ChatUi }) {
       <div className="w-[240px] overflow-hidden rounded-xl bg-white text-[#020202] shadow-sm">
         <div className="bg-[var(--gold-400)] px-3 py-2.5">
           <div className="text-[13px] font-semibold text-white">ATSOKO Showcase</div>
-          <div className="text-[10px] text-[var(--gold-50)]">Flex Message · ปรับแต่งได้ทั้งใบ</div>
+          <div className="text-[10px] text-[var(--gold-50)]">Flex Message · a fully custom card</div>
         </div>
         <img src="/images/demo.png" alt="" className="aspect-video w-full object-cover" />
         <div className="space-y-1.5 px-3 py-2.5">
-          <div className="text-[12px] font-semibold">Flex = การ์ดที่ออกแบบเองได้</div>
+          <div className="text-[12px] font-semibold">Flex = a card you design yourself</div>
           <div className="text-[11px] leading-snug text-slate-500">
-            ซ้อน box (vertical / horizontal), ใส่ image, separator, สี — เหมือนทำใน Figma
+            Stack boxes (vertical / horizontal), add images, separators and colors — like laying out a design in Figma
           </div>
           <div className="my-1 border-t border-slate-100" />
           <div className="flex items-center justify-between">
-            <span className="text-[11px] text-slate-500">ค่าบริการ</span>
+            <span className="text-[11px] text-slate-500">Price</span>
             <span className="text-[14px] font-semibold text-[var(--gold-500)]">฿ 1,290</span>
           </div>
         </div>
         <div className="space-y-1.5 border-t border-slate-100 px-3 py-2.5">
           <div className="rounded-md bg-[var(--gold-400)] py-1.5 text-center text-[11px] font-medium text-white">
-            เปิดเว็บไซต์ ATSOKO
+            Open ATSOKO website
           </div>
           <div className="rounded-md border border-slate-300 py-1.5 text-center text-[11px] font-medium">
-            ดันท่า Postback
+            Fire a Postback
           </div>
           <div className="py-0.5 text-center text-[11px] font-medium text-[var(--gold-600)] underline">
-            กดแล้วส่งข้อความ 'carousel'
+            This tap sends: carousel
           </div>
           <div className="py-0.5 text-center text-[11px] font-medium text-[var(--gold-600)] underline">
-            คัดลอกรหัส FLEX2026
+            Copy code FLEX2026
           </div>
         </div>
       </div>
@@ -226,9 +225,9 @@ function FlexMock({ ui }: { ui: ChatUi }) {
 
 function CarouselMock({ ui }: { ui: ChatUi }) {
   const items = [
-    { n: "แพ็กเกจ S", name: "Starter", price: "฿ 490", hot: false },
-    { n: "แพ็กเกจ P", name: "Pro", price: "฿ 1,290", hot: true },
-    { n: "แพ็กเกจ E", name: "Enterprise", price: "฿ 3,900", hot: false },
+    { n: "Package S", name: "Starter", price: "฿ 490", hot: false },
+    { n: "Package P", name: "Pro", price: "฿ 1,290", hot: true },
+    { n: "Package E", name: "Enterprise", price: "฿ 3,900", hot: false },
   ];
   return (
     <Frame>
@@ -248,7 +247,7 @@ function CarouselMock({ ui }: { ui: ChatUi }) {
               <div className="text-[10px] font-semibold">{it.name}</div>
               <div className="text-[13px] font-semibold text-[var(--gold-500)]">{it.price}</div>
               <div className="rounded-md bg-[var(--gold-400)] py-1 text-center text-[10px] font-medium text-white">
-                สนใจ
+                I'm interested
               </div>
             </div>
           </div>
@@ -263,8 +262,8 @@ function QuickMock({ ui }: { ui: ChatUi }) {
   return (
     <Frame>
       <UserBubble ui={ui}>quick</UserBubble>
-      <BotBubble>⚡ Quick Reply — ชิปที่ขึ้นมาเหนือคีย์บอร์ด แตะแล้วส่งต่อให้บอททันที 👇</BotBubble>
-      <Chips ui={ui} items={["ขอบคุณ 🙏", "ดู Flex", "📅 เลือกวันนัด", "เปิดเมนู"]} />
+      <BotBubble>⚡ Quick Reply — chips above the keyboard. Tap one and it goes straight to the bot 👇</BotBubble>
+      <Chips ui={ui} items={["Thank you 🙏", "See Flex", "📅 Pick a date", "Open menu"]} />
     </Frame>
   );
 }
@@ -276,11 +275,11 @@ function ComboMock({ ui }: { ui: ChatUi }) {
       <div className="w-[220px] rounded-xl bg-white px-3 py-2.5 shadow-sm">
         <div className="text-[12px] font-semibold">🎯 Combo: Flex + Quick Reply</div>
         <div className="mt-1 text-[10px] leading-snug text-slate-500">
-          quickReply แนบกับ flex ตรง ๆ ไม่ได้ → reply 2 ข้อความต่อกันแทน
+          quickReply can't attach to a flex card directly — so we send a second text message.
         </div>
       </div>
-      <BotBubble>👇 แล้วตรงนี้ก็มี Quick Reply ต่อทันที</BotBubble>
-      <Chips ui={ui} items={["เอาอีก", "พอแล้ว"]} />
+      <BotBubble>👇 and here come the Quick Reply chips</BotBubble>
+      <Chips ui={ui} items={["More", "That's enough"]} />
     </Frame>
   );
 }
@@ -292,22 +291,22 @@ function TemplateMock({ ui }: { ui: ChatUi }) {
       <BotBubble className="max-w-[92%] overflow-hidden">
         <img src="/images/demo.png" alt="" className="-mx-3 -mt-2 mb-2 w-[calc(100%+24px)]" />
         <div className="text-[13px] font-semibold">Buttons Template</div>
-        <div className="mb-2 text-[11px] text-slate-500">การ์ด + ปุ่มด้านล่าง (มี thumbnail ได้สูงสุด 4 ปุ่ม)</div>
+        <div className="mb-2 text-[11px] text-slate-500">Card + buttons below (max 4 with a thumbnail)</div>
         <div className="space-y-1">
-          <TBtn kind="primary" label="ส่งข้อความ" />
+          <TBtn kind="primary" label="Send a message" />
           <TBtn kind="outline" label="Postback" />
-          <TBtn kind="outline" label="เปิดเว็บ ATSOKO" />
-          <TBtn kind="outline" label="เลือกเวลา 📅" />
+          <TBtn kind="outline" label="Open ATSOKO website" />
+          <TBtn kind="outline" label="Pick a time 📅" />
         </div>
       </BotBubble>
       <BotBubble className="max-w-[92%]">
-        <div className="mb-2 text-[12px]">Confirm Template — ถามเพื่อยืนยัน</div>
+        <div className="mb-2 text-[12px]">Confirm Template — a yes/no question</div>
         <div className="flex gap-1.5">
           <div className="flex-1 rounded-md bg-[#06c755] py-1.5 text-center text-[12px] font-medium text-white">
-            ✅ ใช่
+            ✅ Yes
           </div>
           <div className="flex-1 rounded-md border border-[#06c755] py-1.5 text-center text-[12px] font-medium text-[#06c755]">
-            ❌ ไม่ใช่
+            ❌ No
           </div>
         </div>
       </BotBubble>
@@ -316,7 +315,7 @@ function TemplateMock({ ui }: { ui: ChatUi }) {
           <div key={i} className="relative shrink-0">
             <img src={`/images/demo-card${i === 1 ? "" : `-${i}`}.png`} alt="" className="h-20 w-20 rounded-md" />
             <span className="absolute inset-x-0 bottom-0 rounded-b-md bg-white/90 py-0.5 text-center text-[9px] font-medium">
-              สินค้า {["A", "B", "C"][i - 1]}
+              Item {["A", "B", "C"][i - 1]}
             </span>
           </div>
         ))}

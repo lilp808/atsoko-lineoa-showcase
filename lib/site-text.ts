@@ -48,7 +48,7 @@ export const UI: Record<Lang, UiStrings> = {
     rawLabel: (n) => `Raw payload (${n} message)`,
     closeLabel: "▲ ปิด",
     copyJsonLabel: "copy JSON",
-    langNote: "",
+    langNote: "หมายเหตุ: ตอนนี้ข้อความที่บอทตอบจริงเป็นภาษาอังกฤษทั้งหมด — preview และ raw JSON ตรงกับ payload จริง",
     langSwitch: "English",
     footer: "สร้างด้วย Next.js + Vercel · rule-based chatbot ตัวอย่างโดย ATSOKO · API docs จริงที่",
     categories: Object.fromEntries(CATEGORY_KEYS.map((c) => [c, c])),
@@ -84,8 +84,7 @@ export const UI: Record<Lang, UiStrings> = {
     rawLabel: (n) => `Raw payload (${n} message${n > 1 ? "s" : ""})`,
     closeLabel: "▲ close",
     copyJsonLabel: "copy JSON",
-    langNote:
-      "Note: the bot itself replies in Thai (it is a Thai LINE OA) — bubbles below mirror the real payload as-is.",
+    langNote: "",
     langSwitch: "ไทย",
     footer: "Built with Next.js + Vercel · rule-based chatbot showcase by ATSOKO · official docs:",
     categories: {

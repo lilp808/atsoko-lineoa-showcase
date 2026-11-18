@@ -24,7 +24,7 @@ Includes a bilingual (TH/EN) catalog page that simulates the chat bubbles and sh
 | `location` | location pin + quickReply confirmation |
 | anything else | fallback with suggestion chips / acknowledges media types you send |
 
-> Bot replies are in Thai (it is a Thai LINE OA); the catalog UI can switch to English with `?lang=en`.
+> All bot replies in this demo are in English. The catalog page itself switches TH/EN with `?lang=en`.
 
 ## Run locally
 
@@ -68,8 +68,8 @@ Environment variables (real values live in the LINE Developers console):
 - [ ] `help` → text + buttons (4 buttons)
 - [ ] press a menu button → postback → that sample is delivered
 - [ ] `flex` → gold card; test all four buttons: URI / postback / message / clipboard
-- [ ] `carousel` → swipe 3 bubbles, tap "สนใจ" → fallback with chips
-- [ ] `quick` → chips appear; tap the date picker → postback.params comes back
+- [ ] `carousel` → swipe 3 bubbles; tap "I'm interested" → fallback with chips
+- [ ] `quick` → chips appear; tap "📅 Pick a date" → calendar opens → postback.params comes back
 - [ ] `combo` → flex card then a text message with chips
 - [ ] `template` → buttons + confirm + image carousel
 - [ ] `imagemap` → tap each zone → different actions fire

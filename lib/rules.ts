@@ -2,7 +2,7 @@ import type { LineMessage, WebhookEvent } from "@/lib/line";
 import { findExampleById, findExampleByKeyword, EXAMPLES } from "@/lib/examples";
 import type { ExampleContext } from "@/lib/examples/types";
 
-/** chip สำรองสำหรับ fallback */
+/** suggestion chips used by the fallback reply */
 const suggestionChips = (labels: string[]) => ({
   items: labels.map((text) => ({
     type: "bubble" as const,
@@ -11,7 +11,8 @@ const suggestionChips = (labels: string[]) => ({
 });
 
 /**
- * rule engine หลัก: webhook event → messages ที่จะ reply (null = ไม่ต้องตอบ)
+ * Main rule engine: webhook event → messages to reply (null = stay silent)
+ * All user-facing text is English so the showcase works for any audience.
  */
 export function buildReply(
   event: WebhookEvent,
@@ -19,7 +20,7 @@ export function buildReply(
 ): LineMessage[] | null {
   switch (event.type) {
     case "follow":
-      // ทักทายเมื่อแอดเพื่อน
+      // welcomed when added as a friend
       return EXAMPLES.find((e) => e.id === "help")!.build(ctx);
 
     case "message": {
@@ -27,32 +28,56 @@ export function buildReply(
       if (!m) return null;
 
       if (m.type === "text" && m.text) {
+        const lower = m.text.trim().toLowerCase();
+
+        // the Confirm template's "No" button sends this literal text
+        if (lower === "confirm-no") {
+          return [
+            {
+              type: "text",
+              text: "👌 Got it — the \"No\" button just sends normal text back to the bot.\nType help whenever you want to continue 👇",
+              quickReply: suggestionChips(["help", "flex"]),
+            },
+          ];
+        }
+
+        // the "Correct ✅" chip on the location sample sends "yes"
+        if (lower === "yes") {
+          return [
+            {
+              type: "text",
+              text: "✅ Noted! That chip was a message action — it sends fixed text ('yes') back into the chat, exactly like the user typed it.",
+              quickReply: suggestionChips(["help", "media", "imagemap"]),
+            },
+          ];
+        }
+
         const example = findExampleByKeyword(m.text);
         if (example) return example.build(ctx);
 
-        // keyword อื่น → fallback พร้อมชิปแนะนำ
+        // unknown keyword → fallback with suggestion chips
         return [
           {
             type: "text",
-            text: `🤖 (fallback rule) ยังไม่มีคำสั่งสำหรับ "${m.text.trim()}"\n\nพิมพ์ "help" เพื่อดูเมนู หรือแตะชิปด้านล่าง 👇`,
+            text: `🤖 (fallback rule) No command matches "${m.text.trim()}".\n\nType "help" for the menu, or tap a chip 👇`,
             quickReply: suggestionChips(["help", "flex", "quick", "imagemap"]),
           },
         ];
       }
 
-      // user ส่งมีเดีย/สติกเกอร์/location มา → echo รับ + ชิป help
+      // user sent media/sticker/location → acknowledge its type + suggest help
       const ack: Record<string, string> = {
-        image: "📷 รับรูปแล้ว! (webhook ได้ event message.type=image)",
-        video: "🎬 รับวิดีโอแล้ว!",
-        audio: "🎧 รับเสียงแล้ว!",
-        sticker: "🐰 รับสติกเกอร์แล้ว น่ารักดี!",
-        location: "📍 รับตำแหน่งแล้ว!",
-        file: "📁 รับไฟล์แล้ว!",
+        image: "📷 Got your photo! (the webhook received message.type=image)",
+        video: "🎬 Got your video!",
+        audio: "🎧 Got your voice message!",
+        sticker: "🐰 Nice sticker!",
+        location: "📍 Got your location!",
+        file: "📁 Got your file!",
       };
       return [
         {
           type: "text",
-          text: `${ack[m.type] ?? `รับ ${m.type} แล้ว!`}\n\nลองพิมพ์ "help" เพื่อดูตัวอย่างข้อความชนิดต่าง ๆ 👇`,
+          text: `${ack[m.type] ?? `Received your ${m.type}!`}\n\nType "help" to browse message samples 👇`,
           quickReply: suggestionChips(["help", "flex", "template"]),
         },
       ];
@@ -61,29 +86,29 @@ export function buildReply(
     case "postback": {
       const data = event.postback?.data ?? "";
 
-      // kw:<id> → ส่งตัวอย่างตาม id
+      // kw:<id> → send the matching sample
       if (data.startsWith("kw:")) {
         const example = findExampleById(data.slice(3));
         if (example) return example.build(ctx);
       }
 
-      // dt:<purpose> → user เลือกวัน/เวลาจาก datetimePicker
+      // dt:<purpose> → user picked a date/time in the datetimePicker
       if (data.startsWith("dt:")) {
         const p = event.params?.[0];
         const picked =
           p?.type === "date"
-            ? `วันที่ ${p.date ?? "?"}`
+            ? `the date ${p.date ?? "?"}`
             : p?.type === "time"
-              ? `เวลา ${p.time ?? "?"}`
+              ? `the time ${p.time ?? "?"}`
               : p?.type === "datetime"
-                ? `${p.date ?? "?"} ${p.time ?? ""}`.trim()
+                ? `${p.date ?? "?"} at ${p.time ?? "?"}`
                 : null;
         return [
           {
             type: "text",
             text: picked
-              ? `🗓 คุณเลือก ${picked} (ได้รับผ่าน postback.params)\n\nnote: ค่าที่ user เลือกจะไม่อยู่ใน text แต่อยู่ใน postback event`
-              : `🗓 ได้รับ postback datetime (${data}) แล้ว`,
+              ? `🗓 You picked ${picked} — delivered via postback.params.\n\nNote: the chosen value arrives inside the postback event, not as chat text.`
+              : `🗓 Received datetime postback (${data}).`,
             quickReply: suggestionChips(["quick", "help"]),
           },
         ];
@@ -91,7 +116,7 @@ export function buildReply(
 
       if (data === "confirm:yes") {
         return [
-          { type: "text", text: "🙌 จัดให้! นี่ตัวอย่าง Flex Carousel ต่อจาก Confirm →" },
+          { type: "text", text: "🙌 Here you go — a Flex Carousel, right after the Confirm 👇" },
           ...buildPostbackExample("carousel", ctx),
         ];
       }
@@ -99,19 +124,19 @@ export function buildReply(
         return [
           {
             type: "text",
-            text: "👌 ไม่เป็นไร ไว้พิมพ์ help เมื่อไหร่ก็ได้",
+            text: "👌 No worries — type help whenever you're ready",
             quickReply: suggestionChips(["help"]),
           },
         ];
       }
       if (data === "combo:stop") {
-        return [{ type: "text", text: "จบทัวร์แค่นี้ก่อน 🙏 พิมพ์ help เมื่ออยากชมต่อ" }];
+        return [{ type: "text", text: "That's a wrap on the tour 🙏 Type help anytime to start over" }];
       }
       if (data === "imagemap:last") {
         return [
           {
             type: "text",
-            text: "🎯 คุณแตะโซนที่ 5 ของ Imagemap — ทุกโซนส่ง event type=postback/message เข้า webhook เหมือนกดปุ่มปกติ",
+            text: "🎯 You tapped zone 5 of the Imagemap — every zone fires a postback/message event into the webhook, just like a button.",
           },
         ];
       }
@@ -119,13 +144,13 @@ export function buildReply(
       return [
         {
           type: "text",
-          text: `ได้รับ postback data="${data}"\n(rule ยังไม่มี handler สำหรับ data นี้ — แก้ได้ที่ lib/rules.ts)`,
+          text: `Received postback data="${data}".\nNo rule matched this payload yet — add handlers in lib/rules.ts.`,
         },
       ];
     }
 
     default:
-      // join / leave / unfollow / beacon → ไม่ต้องตอบ
+      // join / leave / unfollow / beacon → stay silent
       return null;
   }
 }

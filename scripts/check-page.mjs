@@ -32,6 +32,7 @@ has(en, "ไทย", "lang switch back to TH");
 console.log("== /api/examples ==");
 const data = await (await fetch(`${base}/api/examples`)).json();
 console.log(`examples count: ${data.count}`);
+const thaiInPayload = /[\u0E01-\u0E30]/; // เฉพาะอักษรไทย — ไม่จับ "฿" (U+0E3F, ใช้ในราคา)
 for (const ex of data.examples) {
   const types = ex.messages.map((m) => m.type).join(",");
   console.log(`- ${ex.keyword.padEnd(10)} → [${types}]`);
@@ -39,7 +40,14 @@ for (const ex of data.examples) {
     bad++;
     console.log(`  ERROR: ${ex.keyword} exceeds 5 messages/reply`);
   }
+  const json = JSON.stringify(ex.messages);
+  const m = json.match(thaiInPayload);
+  if (m) {
+    bad++;
+    console.log(`  ERROR: ${ex.keyword} payload still contains Thai text`);
+  }
 }
+console.log("- payload language: all English ✓");
 
 if (bad) {
   console.log(`\n${bad} problem(s) ❌`);

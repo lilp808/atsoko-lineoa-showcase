@@ -1,20 +1,20 @@
 import type { LineMessage } from "@/lib/line";
 import type { ExampleContext } from "./types";
 
-/** พิมพ์ `text` — ข้อความพื้นฐาน: ขึ้นบรรทัดใหม่, emoji, ลิงก์ (LINE auto-link ให้) */
+/** Type `text` — basic message: newlines, emoji, auto-linked URLs */
 export function buildText(ctx: ExampleContext): LineMessage[] {
   void ctx;
   return [
     {
       type: "text",
       text: [
-        "📝 Text Message พื้นฐาน",
+        "📝 Basic Text Message",
         "",
-        "• ขึ้นบรรทัดใหม่ได้ด้วย \\n",
-        "• ใส่ emoji ได้เลย 🎉🙏✨",
-        "• ส่งได้ยาวสุด 5,000 ตัวอักษร (ไม่มีลิงก์) / 2,500 (มีลิงก์)",
+        "• New lines with \\n",
+        "• Emoji work out of the box 🎉🙏✨",
+        "• Up to 5,000 characters (2,500 when it contains links)",
         "",
-        "ลิงก์จะกดได้ทันที: https://atsoko.com",
+        "Links are tappable right in chat: https://atsoko.com",
       ].join("\n"),
     },
   ];

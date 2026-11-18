@@ -2,46 +2,46 @@ import type { LineAction, LineMessage } from "@/lib/line";
 import type { ExampleContext } from "./types";
 import { GOLD } from "./types";
 
-/** helper สร้าง quick-reply bubble chip (สีพื้นทองอ่อนเข้าแบรนด์) */
+/** helper: quick-reply bubble chip (soft gold background to match the brand) */
 const chip = (label: string, action: LineAction) => ({
   type: "bubble" as const,
   color: "#FDF6E3",
   action,
 });
 
-/** พิมพ์ `quick` — Quick Reply chips เหนือคีย์บอร์ด (message / postback / datetimePicker) */
+/** Type `quick` — Quick Reply chips above the keyboard (message / postback / datetimePicker) */
 export function buildQuickReply(ctx: ExampleContext): LineMessage[] {
   void ctx;
   return [
     {
       type: "text",
-      text: "⚡ Quick Reply — ชิปที่ขึ้นมาเหนือคีย์บอร์ด แตะแล้วส่งต่อให้บอททันที ลองเลือกดู 👇",
+      text: "⚡ Quick Reply — chips that appear above the keyboard. Tap one and it's sent straight to the bot 👇",
       quickReply: {
         items: [
-          chip("ขอบคุณ 🙏", { type: "message", label: "ขอบคุณ 🙏", text: "ขอบคุณค่ะ/ครับ 🙏" }),
-          chip("ดู Flex", { type: "postback", label: "ดู Flex", data: "kw:flex", text: "ขอดู Flex ด้วย" }),
-          chip("เลือกวันนัด", {
+          chip("Thank you 🙏", { type: "message", label: "Thank you 🙏", text: "Thank you! 🙏" }),
+          chip("See Flex", { type: "postback", label: "See Flex", data: "kw:flex", text: "Show me Flex" }),
+          chip("Pick a date", {
             type: "datetimepicker",
-            label: "เลือกวันนัด",
+            label: "📅 Pick a date",
             data: "dt:booking",
             mode: "date",
             initial: "2026-12-01",
             min: "2026-11-18",
             max: "2026-12-31",
           }),
-          chip("เปิดเมนู", { type: "message", label: "เปิดเมนู", text: "help" }),
+          chip("Open menu", { type: "message", label: "Open menu", text: "help" }),
         ],
       },
     },
   ];
 }
 
-/** พิมพ์ `combo` — Flex + Quick Reply ในรอบเดียว (ส่ง 2 ข้อความ เพราะ quickReply แนบกับ flex โดยตรงไม่ได้) */
+/** Type `combo` — Flex + Quick Reply in one reply (2 messages: quickReply can't attach to flex directly) */
 export function buildCombo(ctx: ExampleContext): LineMessage[] {
   return [
     {
       type: "flex",
-      altText: "ตัวอย่าง Flex การ์ดเล็ก + Quick Reply ด้านล่าง",
+      altText: "Small flex card followed by Quick Reply chips",
       contents: {
         type: "bubble",
         size: "kilo",
@@ -53,7 +53,7 @@ export function buildCombo(ctx: ExampleContext): LineMessage[] {
             { type: "text", text: "🎯 Combo: Flex + Quick Reply", color: "#111827", size: "md", weight: "bold", wrap: true },
             {
               type: "text",
-              text: "quickReply แนบได้กับ text/image/video/audio/location เท่านั้น จึงต้องส่ง textพร้อมชิป เป็นข้อความถัดไป (1 reply ส่งได้สูงสุด 5 ข้อความ)",
+              text: "quickReply only attaches to text/image/video/audio/location — not to flex. The trick: reply with 2 messages (one reply allows up to 5).",
               color: "#6B7280",
               size: "xs",
               wrap: true,
@@ -70,14 +70,14 @@ export function buildCombo(ctx: ExampleContext): LineMessage[] {
                   color: GOLD,
                   height: "sm",
                   flex: 1,
-                  action: { type: "message", label: "ดู carousel", text: "carousel" },
+                  action: { type: "message", label: "See carousel", text: "carousel" },
                 },
                 {
                   type: "button",
                   style: "secondary",
                   height: "sm",
                   flex: 1,
-                  action: { type: "message", label: "ดู imagemap", text: "imagemap" },
+                  action: { type: "message", label: "See imagemap", text: "imagemap" },
                 },
               ],
             },
@@ -87,11 +87,11 @@ export function buildCombo(ctx: ExampleContext): LineMessage[] {
     },
     {
       type: "text",
-      text: "👇 แล้วตรงนี้ก็มี Quick Reply ต่อทันที",
+      text: "👇 and here come the Quick Reply chips",
       quickReply: {
         items: [
-          chip("เอาอีก", { type: "message", label: "เอาอีก", text: "help" }),
-          chip("พอแล้ว", { type: "postback", label: "พอแล้ว", data: "combo:stop", text: "พอแล้วครับ" }),
+          chip("More", { type: "message", label: "More", text: "help" }),
+          chip("That's enough", { type: "postback", label: "That's enough", data: "combo:stop", text: "That's enough, thanks" }),
         ],
       },
     },

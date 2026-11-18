@@ -2,12 +2,12 @@ import type { LineMessage } from "@/lib/line";
 import type { ExampleContext } from "./types";
 import { GOLD, GOLD_DARK, TEXT_MAIN, TEXT_MUTED } from "./types";
 
-/** พิมพ์ `flex` — Flex Message แบบ Bubble: header / hero / body / footer + ปุ่มครบทุก action */
+/** Type `flex` — Flex Bubble: header / hero / body / footer + all four action buttons */
 export function buildFlexBubble(ctx: ExampleContext): LineMessage[] {
   return [
     {
       type: "flex",
-      altText: "ตัวอย่าง Flex Message — การ์ดสินค้า ATSOKO",
+      altText: "Flex Message sample — ATSOKO showcase card",
       contents: {
         type: "bubble",
         size: "mega",
@@ -18,7 +18,7 @@ export function buildFlexBubble(ctx: ExampleContext): LineMessage[] {
           paddingAll: "16px",
           contents: [
             { type: "text", text: "ATSOKO Showcase", color: "#FFFFFF", size: "lg", weight: "bold" },
-            { type: "text", text: "Flex Message · ปรับแต่งได้ทั้งใบ", color: "#FDF6E3", size: "xs" },
+            { type: "text", text: "Flex Message · a fully custom card", color: "#FDF6E3", size: "xs" },
           ],
         },
         hero: {
@@ -34,10 +34,10 @@ export function buildFlexBubble(ctx: ExampleContext): LineMessage[] {
           layout: "vertical",
           spacing: "md",
           contents: [
-            { type: "text", text: "Flex = การ์ดที่ออกแบบเองได้", color: TEXT_MAIN, size: "md", weight: "bold", wrap: true },
+            { type: "text", text: "Flex = a card you design yourself", color: TEXT_MAIN, size: "md", weight: "bold", wrap: true },
             {
               type: "text",
-              text: "ซ้อน box (vertical / horizontal / baseline), ใส่ image, separator, สี, ฟอนต์, ระยะห่าง ครบเหมือนทำใน Figma",
+              text: "Stack boxes (vertical / horizontal / baseline), add images, separators, colors and spacing — like laying out a design in Figma",
               color: TEXT_MUTED,
               size: "sm",
               wrap: true,
@@ -48,7 +48,7 @@ export function buildFlexBubble(ctx: ExampleContext): LineMessage[] {
               layout: "horizontal",
               margin: "md",
               contents: [
-                { type: "text", text: "ค่าบริการ", color: TEXT_MUTED, size: "sm" },
+                { type: "text", text: "Price", color: TEXT_MUTED, size: "sm" },
                 { type: "filler" },
                 { type: "text", text: "฿ 1,290", color: GOLD_DARK, size: "lg", weight: "bold" },
               ],
@@ -65,7 +65,7 @@ export function buildFlexBubble(ctx: ExampleContext): LineMessage[] {
               style: "primary",
               color: GOLD,
               height: "sm",
-              action: { type: "uri", label: "เปิดเว็บไซต์ ATSOKO", uri: "https://atsoko.com" },
+              action: { type: "uri", label: "Open ATSOKO website", uri: "https://atsoko.com" },
             },
             {
               type: "button",
@@ -73,22 +73,22 @@ export function buildFlexBubble(ctx: ExampleContext): LineMessage[] {
               height: "sm",
               action: {
                 type: "postback",
-                label: "ดันท่า Postback",
+                label: "Fire a Postback",
                 data: "kw:quick",
-                text: "ขอตัวอย่าง Quick Reply หน่อย",
+                text: "Show me Quick Reply",
               },
             },
             {
               type: "button",
               style: "link",
               height: "sm",
-              action: { type: "message", label: "กดแล้วส่งข้อความ 'carousel'", text: "carousel" },
+              action: { type: "message", label: "This tap sends: carousel", text: "carousel" },
             },
             {
               type: "button",
               style: "link",
               height: "sm",
-              action: { type: "clipboard", label: "คัดลอกรหัส FLEX2026", text: "FLEX2026" },
+              action: { type: "clipboard", label: "Copy code FLEX2026", text: "FLEX2026" },
             },
           ],
         },
@@ -97,17 +97,17 @@ export function buildFlexBubble(ctx: ExampleContext): LineMessage[] {
   ];
 }
 
-/** พิมพ์ `carousel` — Flex Carousel: หลาย bubble ปัดขวาได้ */
+/** Type `carousel` — Flex Carousel: several bubbles, swipe left/right */
 export function buildFlexCarousel(ctx: ExampleContext): LineMessage[] {
   const items = [
-    { name: "Starter", price: "฿ 490", desc: "Webhook พื้นฐาน ตอบ keyword" },
+    { name: "Starter", price: "฿ 490", desc: "Basic webhook, keyword replies" },
     { name: "Pro", price: "฿ 1,290", desc: "Flex + Carousel + Quick Reply" },
-    { name: "Enterprise", price: "฿ 3,900", desc: "Rich menu + AI reply + รายงาน" },
+    { name: "Enterprise", price: "฿ 3,900", desc: "Rich menu + AI replies + reports" },
   ];
   return [
     {
       type: "flex",
-      altText: "ตัวอย่าง Flex Carousel — แพ็กเกจ 3 รายการ",
+      altText: "Flex Carousel sample — 3 package cards",
       contents: {
         type: "carousel",
         containers: items.map((it, i) => ({
@@ -121,7 +121,7 @@ export function buildFlexCarousel(ctx: ExampleContext): LineMessage[] {
             contents: [
               {
                 type: "text",
-                text: `แพ็กเกจ ${["S", "P", "E"][i]}`,
+                text: `Package ${["S", "P", "E"][i]}`,
                 color: i === 1 ? "#FFFFFF" : GOLD_DARK,
                 size: "md",
                 weight: "bold",
@@ -154,7 +154,7 @@ export function buildFlexCarousel(ctx: ExampleContext): LineMessage[] {
                 style: i === 1 ? "primary" : "secondary",
                 color: GOLD,
                 height: "sm",
-                action: { type: "message", label: "สนใจ", text: `สนใจ${it.name}` },
+                action: { type: "message", label: "I'm interested", text: `Interested in ${it.name}` },
               },
             ],
           },
