@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { verifyLineSignature, replyMessages, type WebhookBody } from "@/lib/line";
 import { buildReply } from "@/lib/rules";
+import { resolveBaseUrl } from "@/lib/base-url";
 import type { ExampleContext } from "@/lib/examples/types";
 
 /**
@@ -43,29 +44,28 @@ export async function POST(request: NextRequest) {
   }
 
   // 3) compose reply แล้วส่งทันที (replyToken มีอายุสั้นมาก)
-  const origin =
-    process.env.NEXT_PUBLIC_BASE_URL ??
-    `${request.nextUrl.protocol}//${request.nextUrl.host}`;
-  const ctx: ExampleContext = { baseUrl: origin.replace(/\/$/, "") };
+  // URL สำหรับ media ต้องเป็น https — resolveBaseUrl的信任 x-forwarded-proto บน Vercel
+  const ctx: ExampleContext = { baseUrl: resolveBaseUrl(request) };
 
-  let replied = 0;
+  const results: unknown[] = [];
   for (const event of payload.events) {
     const messages = buildReply(event, ctx);
     if (!messages || !event.replyToken) continue;
     const res = await replyMessages(event.replyToken, messages);
-    if (res.ok) replied++;
+    results.push({ type: event.type, ok: res.ok, status: res.status, err: res.ok ? null : res.body.slice(0, 300) });
   }
 
-  console.log(`[webhook] events=${payload.events.length} replied=${replied}`);
-  return Response.json({ ok: true, events: payload.events.length, replied });
+  console.log(`[webhook] events=${payload.events.length} ok=${results.filter((r) => (r as { ok: boolean }).ok).length}`, JSON.stringify(results));
+  return Response.json({ ok: true, baseUrl: ctx.baseUrl, events: payload.events.length, results });
 }
 
-/** GET สำหรับเช็คสถานะแบบเร็ว (ไม่ใช่ส่วนหนึ่งของ LINE) */
-export async function GET() {
+/** GET สำหรับเช็คสถานะแบบเร็ว (ไม่ใช่ส่วนหนึ่งของ LINE) — baseUrl บอกว่า media URL จะถูกสร้างเป็นอะไร */
+export async function GET(request: NextRequest) {
   return Response.json({
     ok: true,
     name: "line-oa-showcase webhook",
-    signatureCheck: Boolean(process.env.LINE_CHANNEL_SECRET),
-    accessToken: Boolean(process.env.LINE_CHANNEL_ACCESS_TOKEN),
+    signatureCheck: Boolean(process.env.LINE_CHANNEL_SECRET?.trim()),
+    accessToken: Boolean(process.env.LINE_CHANNEL_ACCESS_TOKEN?.trim()),
+    baseUrl: resolveBaseUrl(request),
   });
 }

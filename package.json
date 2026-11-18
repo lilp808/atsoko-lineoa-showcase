@@ -10,7 +10,8 @@
     "smoke": "node scripts/wait-and-test.mjs",
     "check:page": "node scripts/check-page.mjs",
     "check:actions": "node scripts/check-actions.mjs",
-    "diagnose": "node scripts/diagnose.mjs"
+    "diagnose": "node scripts/diagnose.mjs",
+    "check:live": "node scripts/check-live.mjs"
   },
   "dependencies": {
     "next": "16.4.6",
